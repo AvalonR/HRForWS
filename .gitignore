@@ -20,6 +20,9 @@ obj/
 *.exe
 *.pdb
 
+# Database
+*.db
+
 # Logs
 *.log
 
