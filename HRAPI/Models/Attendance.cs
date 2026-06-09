@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -16,7 +17,7 @@ public class Attendance
     public TimeOnly? CheckIn { get; set; }
     public TimeOnly? CheckOut { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public AttendanceStatus Status { get; set; }
 
     public string? Notes { get; set; }
 

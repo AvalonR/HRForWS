@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -24,7 +25,7 @@ public class PerformanceReview
     public string? AreasForImprovement { get; set; }
     public string? Goals { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public ReviewStatus Status { get; set; }
 
     public DateOnly? NextReviewDate { get; set; }
 

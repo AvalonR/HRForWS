@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -19,7 +20,7 @@ public class Interview
 
     public DateTime InterviewDate { get; set; }
 
-    public string Type { get; set; } = string.Empty;
+    public InterviewType Type { get; set; }
 
     public int? Rating { get; set; }
 

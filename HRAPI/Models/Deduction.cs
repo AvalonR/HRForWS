@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -11,7 +12,7 @@ public class Deduction
     [ForeignKey(nameof(PayrollRecordId))]
     public PayrollRecord PayrollRecord { get; set; } = null!;
 
-    public string Type { get; set; } = string.Empty;
+    public DeductionType Type { get; set; }
 
     public decimal Amount { get; set; }
 

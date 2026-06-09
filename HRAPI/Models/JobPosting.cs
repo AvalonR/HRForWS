@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -24,9 +25,9 @@ public class JobPosting
 
     public DateOnly? ClosingDate { get; set; }
 
-    public string EmploymentType { get; set; } = string.Empty;
+    public EmploymentType EmploymentType { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public JobPostingStatus Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

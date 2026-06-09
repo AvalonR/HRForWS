@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -20,7 +21,7 @@ public class LeaveRequest
 
     public DateOnly EndDate { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public LeaveRequestStatus Status { get; set; }
 
     public string? Reason { get; set; }
 

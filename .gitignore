@@ -21,7 +21,7 @@ obj/
 *.pdb
 
 # Database
-.db
+*.db
 
 # Logs
 *.log

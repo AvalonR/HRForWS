@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -24,7 +25,7 @@ public class PayrollRecord
 
     public DateOnly PayDate { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public PayrollStatus Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
@@ -21,7 +22,7 @@ public class Application
 
     public DateTime ApplicationDate { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public ApplicationStatus Status { get; set; }
 
     public string? Notes { get; set; }
 
