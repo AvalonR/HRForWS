@@ -40,7 +40,8 @@ app.MapGet("/weatherforecast", () =>
 
     return forecast;
 })
-.WithName("GetWeatherForecast");
+.WithName("GetWeatherForecast")
+.WithOpenApi();
 
 app.Run();
 
