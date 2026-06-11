@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Handles salary history validation so salary changes are tracked as records over time.
 public class SalaryHistoryService : ISalaryHistoryService
 {
     private readonly AppDbContext _context;

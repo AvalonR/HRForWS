@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.Deductions;
 
+// DTO used to create a deduction connected to an existing payroll record.
 public class DeductionCreateDto
 {
     [Range(1, int.MaxValue)]

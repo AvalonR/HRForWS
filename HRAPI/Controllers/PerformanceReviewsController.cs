@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Manages performance reviews and the employee/reviewer relationship.
 public class PerformanceReviewsController : ApiControllerBase
 {
     private readonly IPerformanceReviewService _performanceReviewService;

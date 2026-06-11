@@ -2,6 +2,7 @@ using HRAPI.DTOs.LeaveTypes;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for leave type operations used by LeaveTypesController.
 public interface ILeaveTypeService
 {
     Task<List<LeaveTypeReadDto>> GetAllAsync();

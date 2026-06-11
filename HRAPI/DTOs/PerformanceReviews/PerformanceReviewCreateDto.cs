@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.PerformanceReviews;
 
+// DTO used to create a performance review linked to an employee and reviewer.
 public class PerformanceReviewCreateDto
 {
     [Range(1, int.MaxValue)]

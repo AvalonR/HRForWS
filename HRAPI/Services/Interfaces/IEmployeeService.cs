@@ -2,6 +2,7 @@ using HRAPI.DTOs.Employees;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for employee operations used by EmployeesController.
 public interface IEmployeeService
 {
     Task<List<EmployeeReadDto>> GetAllAsync();

@@ -2,6 +2,7 @@ using HRAPI.DTOs.PayrollRecords;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for payroll record operations used by PayrollRecordsController.
 public interface IPayrollRecordService
 {
     Task<List<PayrollRecordReadDto>> GetAllAsync();

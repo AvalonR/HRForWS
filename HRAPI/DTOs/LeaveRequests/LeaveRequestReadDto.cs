@@ -2,6 +2,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.LeaveRequests;
 
+// DTO returned for leave requests with employee, leave type, and reviewer display names.
 public class LeaveRequestReadDto
 {
     public int Id { get; set; }

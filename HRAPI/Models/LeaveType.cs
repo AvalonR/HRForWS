@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRAPI.Models;
 
+// Defines a category of leave and how many days are allowed.
 public class LeaveType
 {
     public int Id { get; set; }

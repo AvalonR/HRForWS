@@ -1,5 +1,6 @@
 namespace HRAPI.DTOs.Employees;
 
+// DTO returned for employees with department, position, and manager names.
 public class EmployeeReadDto
 {
     public int Id { get; set; }

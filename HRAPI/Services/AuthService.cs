@@ -9,6 +9,7 @@ using System.Text;
 
 namespace HRAPI.Services;
 
+// Handles login, current-user lookup, and JWT creation outside the controller.
 public class AuthService : IAuthService
 {
     private readonly UserManager<AppUser> _userManager;
@@ -61,6 +62,7 @@ public class AuthService : IAuthService
         };
     }
 
+    // Builds a signed token containing the user's email and roles for authorization checks.
     private string GenerateJwt(AppUser user, IList<string> roles)
     {
         var jwtSettings = _configuration.GetSection("Jwt");

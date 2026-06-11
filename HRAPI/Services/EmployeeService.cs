@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Centralizes employee validation for department, position, manager, email, and employee number.
 public class EmployeeService : IEmployeeService
 {
     private readonly AppDbContext _context;
@@ -160,6 +161,7 @@ public class EmployeeService : IEmployeeService
         return ServiceResult.Success();
     }
 
+    // Shared create/update validation keeps employee rules consistent across both endpoints.
     private async Task<string?> ValidateEmployeeAsync(
         string employeeNumber,
         string email,

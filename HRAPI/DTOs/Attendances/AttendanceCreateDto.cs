@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.Attendances;
 
+// DTO used to create one attendance record for one employee on one date.
 public class AttendanceCreateDto
 {
     [Range(1, int.MaxValue)]

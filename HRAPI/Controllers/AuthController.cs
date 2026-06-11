@@ -7,6 +7,7 @@ using System.Security.Claims;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Handles login and current-user endpoints for JWT-based authentication.
 public class AuthController : ApiControllerBase
 {
     private readonly IAuthService _authService;
