@@ -1,9 +1,8 @@
-using HRAPI.Data;
 using HRAPI.DTOs.LeaveTypes;
-using HRAPI.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using HRAPI.Services;
+using HRAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HRAPI.Controllers;
 
@@ -11,138 +10,64 @@ namespace HRAPI.Controllers;
 [Route("api/[controller]")]
 public class LeaveTypesController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly ILeaveTypeService _leaveTypeService;
 
-    public LeaveTypesController(AppDbContext context)
+    public LeaveTypesController(ILeaveTypeService leaveTypeService)
     {
-        _context = context;
+        _leaveTypeService = leaveTypeService;
     }
 
     [HttpGet]
     [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
     public async Task<ActionResult<IEnumerable<LeaveTypeReadDto>>> GetLeaveTypes()
     {
-        var leaveTypes = await _context.LeaveTypes
-            .AsNoTracking()
-            .Select(lt => new LeaveTypeReadDto
-            {
-                Id = lt.Id,
-                Name = lt.Name,
-                DaysAllowed = lt.DaysAllowed,
-                IsPaid = lt.IsPaid
-            })
-            .ToListAsync();
-
-        return Ok(leaveTypes);
+        return Ok(await _leaveTypeService.GetAllAsync());
     }
 
     [HttpGet("{id:int}")]
     [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
     public async Task<ActionResult<LeaveTypeReadDto>> GetLeaveType(int id)
     {
-        var leaveType = await _context.LeaveTypes
-            .AsNoTracking()
-            .Where(lt => lt.Id == id)
-            .Select(lt => new LeaveTypeReadDto
-            {
-                Id = lt.Id,
-                Name = lt.Name,
-                DaysAllowed = lt.DaysAllowed,
-                IsPaid = lt.IsPaid
-            })
-            .FirstOrDefaultAsync();
-
-        if (leaveType == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(leaveType);
+        var leaveType = await _leaveTypeService.GetByIdAsync(id);
+        return leaveType == null ? NotFound() : Ok(leaveType);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<LeaveTypeReadDto>> CreateLeaveType(LeaveTypeCreateDto createDto)
     {
-        var nameExists = await _context.LeaveTypes
-            .AnyAsync(lt => lt.Name == createDto.Name);
-
-        if (nameExists)
+        var result = await _leaveTypeService.CreateAsync(createDto);
+        if (!result.Succeeded)
         {
-            return BadRequest("Leave type name already exists.");
+            return BadRequest(result.ErrorMessage);
         }
 
-        var leaveType = new LeaveType
-        {
-            Name = createDto.Name,
-            DaysAllowed = createDto.DaysAllowed,
-            IsPaid = createDto.IsPaid
-        };
-
-        _context.LeaveTypes.Add(leaveType);
-        await _context.SaveChangesAsync();
-
-        var readDto = new LeaveTypeReadDto
-        {
-            Id = leaveType.Id,
-            Name = leaveType.Name,
-            DaysAllowed = leaveType.DaysAllowed,
-            IsPaid = leaveType.IsPaid
-        };
-
-        return CreatedAtAction(nameof(GetLeaveType), new { id = leaveType.Id }, readDto);
+        return CreatedAtAction(nameof(GetLeaveType), new { id = result.Data!.Id }, result.Data);
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateLeaveType(int id, LeaveTypeUpdateDto updateDto)
     {
-        var leaveType = await _context.LeaveTypes.FindAsync(id);
-
-        if (leaveType == null)
-        {
-            return NotFound();
-        }
-
-        var nameExists = await _context.LeaveTypes
-            .AnyAsync(lt => lt.Name == updateDto.Name && lt.Id != id);
-
-        if (nameExists)
-        {
-            return BadRequest("Leave type name already exists.");
-        }
-
-        leaveType.Name = updateDto.Name;
-        leaveType.DaysAllowed = updateDto.DaysAllowed;
-        leaveType.IsPaid = updateDto.IsPaid;
-
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        var result = await _leaveTypeService.UpdateAsync(id, updateDto);
+        return ToActionResult(result);
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteLeaveType(int id)
     {
-        var leaveType = await _context.LeaveTypes.FindAsync(id);
+        var result = await _leaveTypeService.DeleteAsync(id);
+        return ToActionResult(result);
+    }
 
-        if (leaveType == null)
+    private IActionResult ToActionResult(ServiceResult result)
+    {
+        if (result.Succeeded)
         {
-            return NotFound();
+            return NoContent();
         }
 
-        var hasLeaveRequests = await _context.LeaveRequests
-            .AnyAsync(lr => lr.LeaveTypeId == id);
-
-        if (hasLeaveRequests)
-        {
-            return BadRequest("Cannot delete leave type because it is used by leave requests.");
-        }
-
-        _context.LeaveTypes.Remove(leaveType);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        return result.NotFound ? NotFound() : BadRequest(result.ErrorMessage);
     }
 }
