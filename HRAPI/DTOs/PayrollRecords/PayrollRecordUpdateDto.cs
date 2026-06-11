@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.PayrollRecords;
 
+// DTO used to update payroll period, amounts, pay date, and status.
 public class PayrollRecordUpdateDto
 {
     [Range(1, int.MaxValue)]

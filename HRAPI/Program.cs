@@ -10,9 +10,11 @@ using HRAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Registers the EF Core database context so services can access SQLite through dependency injection.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Registers service-layer classes so controllers can call business logic without directly using DbContext.
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
@@ -20,6 +22,7 @@ builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
 builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 
+// ASP.NET Core Identity manages users, hashed passwords, and role-based authorization.
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     // password policy
@@ -31,6 +34,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 
 // AddIdentity registers cookie handlers that hijack the default schemes.
 // Re-register JWT Bearer as the default after AddIdentity.
+// JWT tokens let the frontend authenticate API calls without server-side sessions.
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -71,10 +75,11 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 });
-// Swagger services
+// Swagger services generate interactive API documentation for development and demos.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+// CORS allows the local frontend to call this backend while both apps run on localhost.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -89,6 +94,7 @@ var app = builder.Build();
 // Swagger UI
 if (app.Environment.IsDevelopment())
 {
+    // Swagger UI is enabled in development so reviewers can inspect and test endpoints quickly.
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -102,6 +108,7 @@ app.UseAuthorization();    // ← already assumed but not present
 app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
+    // Seeds demo roles and users so authentication can be tested immediately after the app starts.
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 

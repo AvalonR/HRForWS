@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.Deductions;
 
+// DTO used to update deduction type, amount, and description.
 public class DeductionUpdateDto
 {
     [Range(1, int.MaxValue)]

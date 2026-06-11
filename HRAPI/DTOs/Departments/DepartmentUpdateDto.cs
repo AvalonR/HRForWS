@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Departments;
 
+// DTO used when updating a department; includes editable fields and active status.
 public class DepartmentUpdateDto
 {
     [Required]

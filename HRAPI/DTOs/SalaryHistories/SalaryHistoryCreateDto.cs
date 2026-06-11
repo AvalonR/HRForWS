@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.SalaryHistories;
 
+// DTO used to add a salary history record while validating the employee and positive amount.
 public class SalaryHistoryCreateDto
 {
     [Range(1, int.MaxValue)]

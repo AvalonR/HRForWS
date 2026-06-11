@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Contains department business rules and database access so the controller only returns HTTP responses.
 public class DepartmentService : IDepartmentService
 {
     private readonly AppDbContext _context;
@@ -112,12 +113,14 @@ public class DepartmentService : IDepartmentService
             return ServiceResult.Missing();
         }
 
+        // Prevent deleting a parent department because child departments still depend on it.
         var hasSubDepartments = await _context.Departments.AnyAsync(d => d.ParentDepartmentId == id);
         if (hasSubDepartments)
         {
             return ServiceResult.Failure("Cannot delete department because it has subdepartments.");
         }
 
+        // Prevent deleting a department with employees because it would break employee records.
         var hasEmployees = await _context.Employees.AnyAsync(e => e.DepartmentId == id);
         if (hasEmployees)
         {

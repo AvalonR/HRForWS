@@ -2,6 +2,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.Attendances;
 
+// DTO returned for attendance records with the employee's display name.
 public class AttendanceReadDto
 {
     public int Id { get; set; }

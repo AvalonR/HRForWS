@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Centralizes employee validation, relationship checks, and entity-to-DTO mapping.
 public class EmployeeService : IEmployeeService
 {
     private readonly AppDbContext _context;
@@ -160,6 +161,7 @@ public class EmployeeService : IEmployeeService
         return ServiceResult.Success();
     }
 
+    // Shared create/update validation keeps employee rules consistent across endpoints.
     private async Task<string?> ValidateEmployeeAsync(
         string employeeNumber,
         string email,
@@ -199,6 +201,7 @@ public class EmployeeService : IEmployeeService
             return "Position does not exist.";
         }
 
+        // Ensures the selected position belongs to the selected department.
         if (position.DepartmentId != departmentId)
         {
             return "Position does not belong to the selected department.";

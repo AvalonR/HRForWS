@@ -9,6 +9,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Tracks employee salary changes over time for HR reporting and audit history.
 public class SalaryHistoriesController : ControllerBase
 {
     private readonly AppDbContext _context;

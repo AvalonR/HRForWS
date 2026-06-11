@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Employees;
 
+// DTO used to create an employee while keeping database/navigation fields server-controlled.
 public class EmployeeCreateDto
 {
     [Required]

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Auth;
 
+// DTO returned after login with the JWT and role information needed by the frontend.
 public class LoginResponse
 {
     [Required]

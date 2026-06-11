@@ -4,6 +4,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// Existing recruiting model connecting an applicant to a job posting.
 public class Application
 {
     public int Id { get; set; }

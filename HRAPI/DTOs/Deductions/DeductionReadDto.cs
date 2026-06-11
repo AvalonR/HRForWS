@@ -2,6 +2,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.Deductions;
 
+// DTO returned for deductions with enough payroll/employee context for display.
 public class DeductionReadDto
 {
     public int Id { get; set; }

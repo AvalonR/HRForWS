@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Employees;
 
+// DTO used to update employee profile, department, position, manager, and active status.
 public class EmployeeUpdateDto
 {
     [Required]

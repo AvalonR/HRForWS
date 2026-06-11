@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Departments;
 
+// DTO used when creating a department; clients cannot set server-controlled fields like Id or CreatedAt.
 public class DepartmentCreateDto
 {
     [Required]

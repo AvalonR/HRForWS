@@ -9,6 +9,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Manages payroll deductions that are connected to payroll records.
 public class DeductionsController : ControllerBase
 {
     private readonly AppDbContext _context;

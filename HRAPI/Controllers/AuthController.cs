@@ -12,12 +12,14 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Handles login and "current user" endpoints for JWT-based authentication.
 public class AuthController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
     private readonly IConfiguration _configuration;
 
+    // Builds a signed JWT containing the user's email and roles for protected API calls.
     private string GenerateJwt(AppUser user, IList<string> roles)
     {
         var jwtSettings = _configuration.GetSection("Jwt");
@@ -51,6 +53,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    // Verifies email/password and returns a token that the frontend can send in the Authorization header.
     public async Task<ActionResult<LoginResponse>> Login(LoginRequest loginDto)
     {
         var user = await _userManager.FindByEmailAsync(loginDto.Email);
@@ -72,6 +75,7 @@ public class AuthController : ControllerBase
 
     [HttpGet("me")]
     [Authorize]
+    // Returns the authenticated user's identity information without exposing password or token internals.
     public async Task<ActionResult<CurrentUserResponse>> GetCurrentUser()
     {
         var email = User.FindFirstValue(ClaimTypes.Email);

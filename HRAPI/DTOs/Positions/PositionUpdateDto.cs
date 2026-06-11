@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Positions;
 
+// DTO used when updating a position and its salary range.
 public class PositionUpdateDto
 {
     [Required]

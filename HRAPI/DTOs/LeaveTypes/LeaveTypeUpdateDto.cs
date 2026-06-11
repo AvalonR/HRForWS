@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.LeaveTypes;
 
+// DTO used to update a leave type's allowance and paid/unpaid setting.
 public class LeaveTypeUpdateDto
 {
     [Required]

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Contains leave type rules, including duplicate-name checks and delete protection.
 public class LeaveTypeService : ILeaveTypeService
 {
     private readonly AppDbContext _context;
@@ -76,6 +77,7 @@ public class LeaveTypeService : ILeaveTypeService
             return ServiceResult.Missing();
         }
 
+        // Leave types already used by leave requests cannot be deleted safely.
         var hasLeaveRequests = await _context.LeaveRequests.AnyAsync(lr => lr.LeaveTypeId == id);
         if (hasLeaveRequests)
         {

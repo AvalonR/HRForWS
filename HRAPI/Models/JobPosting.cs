@@ -4,6 +4,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// Existing recruiting model for job advertisements; not part of the current core HR focus.
 public class JobPosting
 {
     public int Id { get; set; }

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Positions;
 
+// DTO used to create a position inside an existing department.
 public class PositionCreateDto
 {
     [Required]

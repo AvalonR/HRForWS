@@ -2,6 +2,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.PerformanceReviews;
 
+// DTO returned for reviews with employee and reviewer names instead of navigation objects.
 public class PerformanceReviewReadDto
 {
     public int Id { get; set; }

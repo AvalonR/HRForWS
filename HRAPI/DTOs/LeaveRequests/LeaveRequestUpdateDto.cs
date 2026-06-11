@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.LeaveRequests;
 
+// DTO used by HR/admins to update request dates, status, reason, and reviewer.
 public class LeaveRequestUpdateDto
 {
     [Range(1, int.MaxValue)]

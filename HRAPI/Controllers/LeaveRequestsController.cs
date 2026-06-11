@@ -8,6 +8,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Handles leave request endpoints while LeaveRequestService enforces date and foreign-key rules.
 public class LeaveRequestsController : ControllerBase
 {
     private readonly ILeaveRequestService _leaveRequestService;

@@ -11,6 +11,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Exposes employee endpoints and keeps employee business rules in EmployeeService.
 public class EmployeesController : ControllerBase
 {
     private readonly IEmployeeService _employeeService;
@@ -31,6 +32,7 @@ public class EmployeesController : ControllerBase
 
     [HttpGet("{id:int}")]
     [Authorize]
+    // Employees can view themselves, while HR roles can view any employee.
     public async Task<ActionResult<EmployeeReadDto>> GetEmployee(int id)
     {
         var isAdmin = User.IsInRole("Admin");

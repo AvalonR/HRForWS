@@ -2,6 +2,7 @@ using HRAPI.DTOs.Positions;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for position-related business operations used by PositionsController.
 public interface IPositionService
 {
     Task<List<PositionReadDto>> GetAllAsync();

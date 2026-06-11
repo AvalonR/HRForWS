@@ -1,5 +1,6 @@
 namespace HRAPI.DTOs.LeaveTypes;
 
+// DTO returned when listing or viewing available leave types.
 public class LeaveTypeReadDto
 {
     public int Id { get; set; }

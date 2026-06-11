@@ -8,6 +8,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Exposes department CRUD endpoints while the DepartmentService handles validation and database work.
 public class DepartmentsController : ControllerBase
 {
     private readonly IDepartmentService _departmentService;

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRAPI.Models;
 
+// Defines a category of leave, such as annual or sick leave, and its allowance rules.
 public class LeaveType
 {
     public int Id { get; set; }

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.SalaryHistories;
 
+// DTO used to update salary amount, effective dates, and change reason.
 public class SalaryHistoryUpdateDto
 {
     [Range(1, int.MaxValue)]

@@ -9,6 +9,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Manages payroll records and validates pay-period and payroll amount rules.
 public class PayrollRecordsController : ControllerBase
 {
     private readonly AppDbContext _context;

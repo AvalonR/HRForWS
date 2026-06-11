@@ -8,6 +8,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Handles employee attendance endpoints such as present, late, absent, and on-leave records.
 public class AttendancesController : ControllerBase
 {
     private readonly IAttendanceService _attendanceService;

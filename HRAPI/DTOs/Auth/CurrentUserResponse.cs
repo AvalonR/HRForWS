@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Auth;
 
+// DTO returned by /api/Auth/me to describe the currently authenticated user.
 public class CurrentUserResponse
 {
     [Required]

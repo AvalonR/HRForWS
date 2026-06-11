@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.Attendances;
 
+// DTO used to update attendance status, times, and notes.
 public class AttendanceUpdateDto
 {
     [Range(1, int.MaxValue)]

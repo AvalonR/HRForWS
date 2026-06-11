@@ -1,5 +1,6 @@
 namespace HRAPI.DTOs.Positions;
 
+// DTO returned for positions, including the related department name for easier display.
 public class PositionReadDto
 {
     public int Id { get; set; }

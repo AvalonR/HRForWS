@@ -8,6 +8,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Manages leave type definitions such as annual, sick, or personal leave.
 public class LeaveTypesController : ControllerBase
 {
     private readonly ILeaveTypeService _leaveTypeService;

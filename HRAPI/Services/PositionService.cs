@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Contains position validation, duplicate checks, and mapping between Position entities and DTOs.
 public class PositionService : IPositionService
 {
     private readonly AppDbContext _context;
@@ -47,6 +48,7 @@ public class PositionService : IPositionService
             return ServiceResult<PositionReadDto>.Failure("Department does not exist.");
         }
 
+        // A department should not contain two positions with the same title.
         var duplicateExists = await _context.Positions.AnyAsync(p => p.Title == dto.Title && p.DepartmentId == dto.DepartmentId);
         if (duplicateExists)
         {

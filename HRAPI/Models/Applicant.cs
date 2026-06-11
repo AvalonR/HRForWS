@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRAPI.Models;
 
+// Existing recruiting model for people who apply for job postings.
 public class Applicant
 {
     public int Id { get; set; }

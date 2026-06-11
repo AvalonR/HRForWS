@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// PayrollRecord stores payment values for an employee during one pay period.
 public class PayrollRecord
 {
     public int Id { get; set; }

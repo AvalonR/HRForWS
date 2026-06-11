@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Handles leave request rules such as valid dates, employee lookup, and default Pending status.
 public class LeaveRequestService : ILeaveRequestService
 {
     private readonly AppDbContext _context;
@@ -65,6 +66,7 @@ public class LeaveRequestService : ILeaveRequestService
             LeaveTypeId = dto.LeaveTypeId,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
+            // New requests start as Pending until HR reviews them.
             Status = LeaveRequestStatus.Pending,
             Reason = dto.Reason,
             DateRequested = now,

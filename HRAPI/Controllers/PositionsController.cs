@@ -8,6 +8,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Exposes job position endpoints and keeps department/duplicate validation inside the service layer.
 public class PositionsController : ControllerBase
 {
     private readonly IPositionService _positionService;

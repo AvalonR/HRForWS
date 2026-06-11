@@ -2,6 +2,7 @@ using HRAPI.DTOs.Attendances;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for attendance operations, including duplicate employee/date checks.
 public interface IAttendanceService
 {
     Task<List<AttendanceReadDto>> GetAllAsync();

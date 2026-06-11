@@ -9,6 +9,7 @@ namespace HRAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// Manages employee performance review records and reviewer relationships.
 public class PerformanceReviewsController : ControllerBase
 {
     private readonly AppDbContext _context;

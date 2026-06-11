@@ -2,6 +2,7 @@ using HRAPI.DTOs.LeaveTypes;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for managing leave type definitions without exposing EF entities to controllers.
 public interface ILeaveTypeService
 {
     Task<List<LeaveTypeReadDto>> GetAllAsync();

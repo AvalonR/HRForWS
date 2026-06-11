@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// Attendance stores one employee's attendance status and optional clock times for a date.
 public class Attendance
 {
     public int Id { get; set; }

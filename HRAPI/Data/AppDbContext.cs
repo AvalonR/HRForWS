@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Data;
 
+// Central EF Core context: defines tables, relationships, constraints, and Identity integration.
 public class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -27,10 +28,12 @@ public class AppDbContext : IdentityDbContext<AppUser>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // IdentityDbContext configures ASP.NET Identity tables before HR-specific mappings are added.
         base.OnModelCreating(modelBuilder);
 
         // ── AppUser 
 
+        // Links a login account to an optional employee profile without requiring every user to be an employee.
         modelBuilder.Entity<AppUser>()
             .HasOne(u => u.Employee)
             .WithMany()
@@ -38,6 +41,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
             .OnDelete(DeleteBehavior.SetNull);
 
         // Unique Indexes 
+        // Unique indexes prevent duplicate business identifiers such as department codes and employee emails.
         modelBuilder.Entity<Department>()
             .HasIndex(d => d.Code)
             .IsUnique();
@@ -68,6 +72,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
 
         // ── Enum String Conversions ──
 
+        // Stores enum values as readable strings in SQLite instead of numeric values.
         modelBuilder.Entity<Attendance>()
             .Property(a => a.Status)
             .HasConversion<string>();
@@ -106,6 +111,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
 
         // ── Decimal Precision ──
 
+        // Money fields use consistent precision because salaries and payroll values need predictable decimals.
         modelBuilder.Entity<SalaryHistory>()
             .Property(s => s.Amount)
             .HasPrecision(18, 2);
@@ -145,12 +151,14 @@ public class AppDbContext : IdentityDbContext<AppUser>
         // Cascade / Restrict Behavior 
 
         // Self-referencing: prevent cascade cycles
+        // Restricting deletes protects department hierarchies from accidental cascading deletion.
         modelBuilder.Entity<Department>()
             .HasOne(d => d.ParentDepartment)
             .WithMany(d => d.SubDepartments)
             .HasForeignKey(d => d.ParentDepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Managers are employees too, so this prevents deleting one employee from cascading through the team.
         modelBuilder.Entity<Employee>()
             .HasOne(e => e.Manager)
             .WithMany(e => e.Subordinates)
@@ -158,6 +166,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
             .OnDelete(DeleteBehavior.Restrict);
 
         // PerformanceReview has two FKs to Employee → avoid multiple cascade paths
+        // Reviewer is also an employee, so delete behavior is restricted to avoid ambiguous cascades.
         modelBuilder.Entity<PerformanceReview>()
             .HasOne(pr => pr.Reviewer)
             .WithMany()
@@ -165,6 +174,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
             .OnDelete(DeleteBehavior.Restrict);
 
         // LeaveRequest has two FKs to Employee → avoid multiple cascade paths
+        // ReviewedByEmployee is optional because new requests start pending before HR reviews them.
         modelBuilder.Entity<LeaveRequest>()
             .HasOne(lr => lr.ReviewedByEmployee)
             .WithMany()
@@ -180,6 +190,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
 
         // ── Seed Data ──
 
+        // Default leave types make the leave request workflow usable right after migrations run.
         modelBuilder.Entity<LeaveType>().HasData(
             new LeaveType { Id = 1, Name = "Annual", DaysAllowed = 20, IsPaid = true },
             new LeaveType { Id = 2, Name = "Sick", DaysAllowed = 10, IsPaid = true },

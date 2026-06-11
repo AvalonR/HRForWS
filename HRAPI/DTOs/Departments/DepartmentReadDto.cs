@@ -1,5 +1,6 @@
 namespace HRAPI.DTOs.Departments;
 
+// DTO returned to clients when reading department data.
 public class DepartmentReadDto
 {
     public int Id { get; set; }
