@@ -1,9 +1,8 @@
-using HRAPI.Data;
 using HRAPI.DTOs.Positions;
-using HRAPI.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using HRAPI.Services;
+using HRAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HRAPI.Controllers;
 
@@ -11,196 +10,64 @@ namespace HRAPI.Controllers;
 [Route("api/[controller]")]
 public class PositionsController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IPositionService _positionService;
 
-    public PositionsController(AppDbContext context)
+    public PositionsController(IPositionService positionService)
     {
-        _context = context;
+        _positionService = positionService;
     }
 
     [HttpGet]
     [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<IEnumerable<PositionReadDto>>> GetPositions()
     {
-        var positions = await _context.Positions
-            .AsNoTracking()
-            .Include(p => p.Department)
-            .Select(p => new PositionReadDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                Description = p.Description,
-                MinSalary = p.MinSalary,
-                MaxSalary = p.MaxSalary,
-                DepartmentId = p.DepartmentId,
-                DepartmentName = p.Department.Name,
-                IsActive = p.IsActive,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            })
-            .ToListAsync();
-
-        return Ok(positions);
+        return Ok(await _positionService.GetAllAsync());
     }
 
     [HttpGet("{id:int}")]
     [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<PositionReadDto>> GetPosition(int id)
     {
-        var position = await _context.Positions
-            .AsNoTracking()
-            .Include(p => p.Department)
-            .Where(p => p.Id == id)
-            .Select(p => new PositionReadDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                Description = p.Description,
-                MinSalary = p.MinSalary,
-                MaxSalary = p.MaxSalary,
-                DepartmentId = p.DepartmentId,
-                DepartmentName = p.Department.Name,
-                IsActive = p.IsActive,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            })
-            .FirstOrDefaultAsync();
-
-        if (position == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(position);
+        var position = await _positionService.GetByIdAsync(id);
+        return position == null ? NotFound() : Ok(position);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<PositionReadDto>> CreatePosition(PositionCreateDto createDto)
     {
-        if (createDto.MinSalary.HasValue && createDto.MaxSalary.HasValue &&
-            createDto.MinSalary > createDto.MaxSalary)
+        var result = await _positionService.CreateAsync(createDto);
+        if (!result.Succeeded)
         {
-            return BadRequest("Minimum salary cannot be greater than maximum salary.");
+            return BadRequest(result.ErrorMessage);
         }
 
-        var department = await _context.Departments
-            .FirstOrDefaultAsync(d => d.Id == createDto.DepartmentId);
-
-        if (department == null)
-        {
-            return BadRequest("Department does not exist.");
-        }
-
-        var duplicateExists = await _context.Positions
-            .AnyAsync(p => p.Title == createDto.Title && p.DepartmentId == createDto.DepartmentId);
-
-        if (duplicateExists)
-        {
-            return BadRequest("Position title already exists in this department.");
-        }
-
-        var position = new Position
-        {
-            Title = createDto.Title,
-            Description = createDto.Description,
-            MinSalary = createDto.MinSalary,
-            MaxSalary = createDto.MaxSalary,
-            DepartmentId = createDto.DepartmentId,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _context.Positions.Add(position);
-        await _context.SaveChangesAsync();
-
-        var readDto = new PositionReadDto
-        {
-            Id = position.Id,
-            Title = position.Title,
-            Description = position.Description,
-            MinSalary = position.MinSalary,
-            MaxSalary = position.MaxSalary,
-            DepartmentId = position.DepartmentId,
-            DepartmentName = department.Name,
-            IsActive = position.IsActive,
-            CreatedAt = position.CreatedAt,
-            UpdatedAt = position.UpdatedAt
-        };
-
-        return CreatedAtAction(nameof(GetPosition), new { id = position.Id }, readDto);
+        return CreatedAtAction(nameof(GetPosition), new { id = result.Data!.Id }, result.Data);
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdatePosition(int id, PositionUpdateDto updateDto)
     {
-        if (updateDto.MinSalary.HasValue && updateDto.MaxSalary.HasValue &&
-            updateDto.MinSalary > updateDto.MaxSalary)
-        {
-            return BadRequest("Minimum salary cannot be greater than maximum salary.");
-        }
-
-        var position = await _context.Positions.FindAsync(id);
-
-        if (position == null)
-        {
-            return NotFound();
-        }
-
-        var departmentExists = await _context.Departments
-            .AnyAsync(d => d.Id == updateDto.DepartmentId);
-
-        if (!departmentExists)
-        {
-            return BadRequest("Department does not exist.");
-        }
-
-        var duplicateExists = await _context.Positions
-            .AnyAsync(p => p.Title == updateDto.Title &&
-                           p.DepartmentId == updateDto.DepartmentId &&
-                           p.Id != id);
-
-        if (duplicateExists)
-        {
-            return BadRequest("Position title already exists in this department.");
-        }
-
-        position.Title = updateDto.Title;
-        position.Description = updateDto.Description;
-        position.MinSalary = updateDto.MinSalary;
-        position.MaxSalary = updateDto.MaxSalary;
-        position.DepartmentId = updateDto.DepartmentId;
-        position.IsActive = updateDto.IsActive;
-        position.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        var result = await _positionService.UpdateAsync(id, updateDto);
+        return ToActionResult(result);
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePosition(int id)
     {
-        var position = await _context.Positions.FindAsync(id);
+        var result = await _positionService.DeleteAsync(id);
+        return ToActionResult(result);
+    }
 
-        if (position == null)
+    private IActionResult ToActionResult(ServiceResult result)
+    {
+        if (result.Succeeded)
         {
-            return NotFound();
+            return NoContent();
         }
 
-        var hasEmployees = await _context.Employees
-            .AnyAsync(e => e.PositionId == id);
-
-        if (hasEmployees)
-        {
-            return BadRequest("Cannot delete position because it has employees.");
-        }
-
-        _context.Positions.Remove(position);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        return result.NotFound ? NotFound() : BadRequest(result.ErrorMessage);
     }
 }
