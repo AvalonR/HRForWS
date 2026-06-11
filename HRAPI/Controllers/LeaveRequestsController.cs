@@ -4,6 +4,7 @@ using HRAPI.Enums;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -19,6 +20,7 @@ public class LeaveRequestsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
     public async Task<ActionResult<IEnumerable<LeaveRequestReadDto>>> GetLeaveRequests()
     {
         var leaveRequests = await _context.LeaveRequests
@@ -49,6 +51,7 @@ public class LeaveRequestsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
     public async Task<ActionResult<LeaveRequestReadDto>> GetLeaveRequest(int id)
     {
         var leaveRequest = await _context.LeaveRequests
@@ -85,6 +88,7 @@ public class LeaveRequestsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager,Employee")]
     public async Task<ActionResult<LeaveRequestReadDto>> CreateLeaveRequest(LeaveRequestCreateDto createDto)
     {
         if (createDto.EndDate < createDto.StartDate)
@@ -146,6 +150,7 @@ public class LeaveRequestsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateLeaveRequest(int id, LeaveRequestUpdateDto updateDto)
     {
         if (updateDto.EndDate < updateDto.StartDate)
@@ -202,6 +207,7 @@ public class LeaveRequestsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteLeaveRequest(int id)
     {
         var leaveRequest = await _context.LeaveRequests.FindAsync(id);

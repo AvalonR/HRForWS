@@ -1,18 +1,21 @@
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoginPage from "./pages/auth/LoginPage";
 import DepartmentsList from "./pages/departments/DepartmentsList";
 
 function App() {
   return (
     <Routes>
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<div>Home</div>} />
-        <Route path="/employees" element={<div>Employees</div>} />
-        <Route path="/departments" element={<DepartmentsList />} />
-        <Route path="/positions" element={<div>Positions</div>} />
-        <Route path="/attendance" element={<div>Attendance</div>} />
-        <Route path="/leave-requests" element={<div>Leave Requests</div>} />
-        <Route path="/leave-types" element={<div>Leave Types</div>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<div>Home</div>} />
+          <Route path="/employees" element={<ProtectedRoute roles={["Admin", "HRManager", "TeamLead"]}><div>Employees</div></ProtectedRoute>} />
+          <Route path="/departments" element={<ProtectedRoute roles={["Admin", "HRManager", "TeamLead"]}><DepartmentsList /></ProtectedRoute>} />
+          <Route path="/positions" element={<ProtectedRoute roles={["Admin", "HRManager", "TeamLead"]}><div>Positions</div></ProtectedRoute>} />
+          <Route path="/leave" element={<ProtectedRoute roles={["Admin", "HRManager", "TeamLead", "Employee"]}><div>Leave</div></ProtectedRoute>} />
+        </Route>
       </Route>
     </Routes>
   );

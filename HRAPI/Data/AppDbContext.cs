@@ -1,10 +1,11 @@
 using HRAPI.Enums;
 using HRAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
@@ -26,8 +27,17 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Unique Indexes 
+        base.OnModelCreating(modelBuilder);
 
+        // ── AppUser 
+
+        modelBuilder.Entity<AppUser>()
+            .HasOne(u => u.Employee)
+            .WithMany()
+            .HasForeignKey(u => u.EmployeeId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Unique Indexes 
         modelBuilder.Entity<Department>()
             .HasIndex(d => d.Code)
             .IsUnique();

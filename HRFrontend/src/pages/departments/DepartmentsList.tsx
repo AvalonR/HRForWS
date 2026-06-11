@@ -15,10 +15,15 @@ import {
   deleteDepartment,
 } from "../../services/DepartmentService";
 import type { DepartmentReadDto } from "../../types/dto";
+import { useAuth } from "../../contexts/AuthContext";
 import DepartmentFormDialog from "./DepartmentFormDialog";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
 
 export default function DepartmentsList() {
+  const { user } = useAuth();
+  const canCreate = user?.roles.some((r) => r === "Admin" || r === "HRManager");
+  const canEdit = canCreate;
+  const canDelete = user?.roles.includes("Admin");
   const [departments, setDepartments] = useState<DepartmentReadDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -139,20 +144,24 @@ export default function DepartmentsList() {
       sortable: false,
       renderCell: ({ row }) => (
         <Box>
-          <Tooltip title="Edit">
-            <IconButton size="small" onClick={() => handleEdit(row)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => setDeleteTarget(row)}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {canEdit && (
+            <Tooltip title="Edit">
+              <IconButton size="small" onClick={() => handleEdit(row)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+          {canDelete && (
+            <Tooltip title="Delete">
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => setDeleteTarget(row)}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       ),
     },
@@ -180,9 +189,11 @@ export default function DepartmentsList() {
         }}
       >
         <Typography variant="h4">Departments</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-          Add Department
-        </Button>
+        {canCreate && (
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+            Add Department
+          </Button>
+        )}
       </Box>
 
       <DataGrid

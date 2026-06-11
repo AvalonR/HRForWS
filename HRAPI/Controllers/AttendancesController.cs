@@ -3,6 +3,7 @@ using HRAPI.DTOs.Attendances;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class AttendancesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<IEnumerable<AttendanceReadDto>>> GetAttendances()
     {
         var attendances = await _context.Attendances
@@ -42,6 +44,7 @@ public class AttendancesController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
     public async Task<ActionResult<AttendanceReadDto>> GetAttendance(int id)
     {
         var attendance = await _context.Attendances
@@ -72,6 +75,7 @@ public class AttendancesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<AttendanceReadDto>> CreateAttendance(AttendanceCreateDto createDto)
     {
         var employee = await _context.Employees
@@ -122,6 +126,7 @@ public class AttendancesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateAttendance(int id, AttendanceUpdateDto updateDto)
     {
         var attendance = await _context.Attendances.FindAsync(id);
@@ -161,6 +166,7 @@ public class AttendancesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteAttendance(int id)
     {
         var attendance = await _context.Attendances.FindAsync(id);

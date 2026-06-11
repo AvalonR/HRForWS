@@ -3,6 +3,7 @@ using HRAPI.DTOs.SalaryHistories;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class SalaryHistoriesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<IEnumerable<SalaryHistoryReadDto>>> GetSalaryHistories()
     {
         var salaryHistories = await _context.SalaryHistories
@@ -41,6 +43,7 @@ public class SalaryHistoriesController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<SalaryHistoryReadDto>> GetSalaryHistory(int id)
     {
         var salaryHistory = await _context.SalaryHistories
@@ -70,6 +73,7 @@ public class SalaryHistoriesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<SalaryHistoryReadDto>> CreateSalaryHistory(SalaryHistoryCreateDto createDto)
     {
         if (createDto.Amount <= 0)
@@ -119,6 +123,7 @@ public class SalaryHistoriesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateSalaryHistory(int id, SalaryHistoryUpdateDto updateDto)
     {
         if (updateDto.Amount <= 0)
@@ -158,6 +163,7 @@ public class SalaryHistoriesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteSalaryHistory(int id)
     {
         var salaryHistory = await _context.SalaryHistories.FindAsync(id);
