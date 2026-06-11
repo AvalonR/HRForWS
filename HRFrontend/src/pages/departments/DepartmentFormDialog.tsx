@@ -6,6 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   createDepartment,
@@ -144,11 +145,9 @@ export default function DepartmentFormDialog({
           ))}
         </TextField>
         {error && (
-          <DialogContent>
-            <DialogActions sx={{ color: "error.main", p: 0 }}>
-              {error}
-            </DialogActions>
-          </DialogContent>
+          <Typography color="error" sx={{ px: 3, pb: 1 }}>
+            {error}
+          </Typography>
         )}
       </DialogContent>
       <DialogActions>
