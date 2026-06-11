@@ -1,5 +1,7 @@
 using HRAPI.Data;
 using HRAPI.Models;
+using HRAPI.Services;
+using HRAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IPositionService, PositionService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
+builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IPayrollRecordService, PayrollRecordService>();
+builder.Services.AddScoped<ISalaryHistoryService, SalaryHistoryService>();
+builder.Services.AddScoped<IPerformanceReviewService, PerformanceReviewService>();
+builder.Services.AddScoped<IDeductionService, DeductionService>();
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     // password policy
