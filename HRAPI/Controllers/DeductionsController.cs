@@ -3,6 +3,7 @@ using HRAPI.DTOs.Deductions;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class DeductionsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<IEnumerable<DeductionReadDto>>> GetDeductions()
     {
         var deductions = await _context.Deductions
@@ -40,6 +42,7 @@ public class DeductionsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<DeductionReadDto>> GetDeduction(int id)
     {
         var deduction = await _context.Deductions
@@ -68,6 +71,7 @@ public class DeductionsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<DeductionReadDto>> CreateDeduction(DeductionCreateDto createDto)
     {
         if (createDto.Amount <= 0)
@@ -110,6 +114,7 @@ public class DeductionsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateDeduction(int id, DeductionUpdateDto updateDto)
     {
         if (updateDto.Amount <= 0)
@@ -142,6 +147,7 @@ public class DeductionsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteDeduction(int id)
     {
         var deduction = await _context.Deductions.FindAsync(id);

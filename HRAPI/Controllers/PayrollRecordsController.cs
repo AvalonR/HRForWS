@@ -3,6 +3,7 @@ using HRAPI.DTOs.PayrollRecords;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class PayrollRecordsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<IEnumerable<PayrollRecordReadDto>>> GetPayrollRecords()
     {
         var payrollRecords = await _context.PayrollRecords
@@ -46,6 +48,7 @@ public class PayrollRecordsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<PayrollRecordReadDto>> GetPayrollRecord(int id)
     {
         var payrollRecord = await _context.PayrollRecords
@@ -80,6 +83,7 @@ public class PayrollRecordsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<PayrollRecordReadDto>> CreatePayrollRecord(PayrollRecordCreateDto createDto)
     {
         var validationError = ValidatePayrollValues(
@@ -143,6 +147,7 @@ public class PayrollRecordsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdatePayrollRecord(int id, PayrollRecordUpdateDto updateDto)
     {
         var validationError = ValidatePayrollValues(
@@ -191,6 +196,7 @@ public class PayrollRecordsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePayrollRecord(int id)
     {
         var payrollRecord = await _context.PayrollRecords.FindAsync(id);

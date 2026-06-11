@@ -3,6 +3,7 @@ using HRAPI.DTOs.PerformanceReviews;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class PerformanceReviewsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<IEnumerable<PerformanceReviewReadDto>>> GetPerformanceReviews()
     {
         var reviews = await _context.PerformanceReviews
@@ -47,6 +49,7 @@ public class PerformanceReviewsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<PerformanceReviewReadDto>> GetPerformanceReview(int id)
     {
         var review = await _context.PerformanceReviews
@@ -82,6 +85,7 @@ public class PerformanceReviewsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<PerformanceReviewReadDto>> CreatePerformanceReview(PerformanceReviewCreateDto createDto)
     {
         var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == createDto.EmployeeId);
@@ -137,6 +141,7 @@ public class PerformanceReviewsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdatePerformanceReview(int id, PerformanceReviewUpdateDto updateDto)
     {
         var review = await _context.PerformanceReviews.FindAsync(id);
@@ -177,6 +182,7 @@ public class PerformanceReviewsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePerformanceReview(int id)
     {
         var review = await _context.PerformanceReviews.FindAsync(id);
