@@ -21,6 +21,7 @@
     <Using Include="Xunit" />
     <Using Include="HRAPI.Data" />
     <Using Include="HRAPI.Services" />
+    <Using Include="FluentAssertions" />
     <Using Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 
