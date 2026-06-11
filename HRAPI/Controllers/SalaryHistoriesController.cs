@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Tracks salary changes over time so previous salary records are not overwritten.
 public class SalaryHistoriesController : ApiControllerBase
 {
     private readonly ISalaryHistoryService _salaryHistoryService;

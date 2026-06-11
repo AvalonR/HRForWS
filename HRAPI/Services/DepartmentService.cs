@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Contains department rules such as parent validation, duplicate codes, and delete protection.
 public class DepartmentService : IDepartmentService
 {
     private readonly AppDbContext _context;

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Manages payroll records and delegates payroll amount validation to the service layer.
 public class PayrollRecordsController : ApiControllerBase
 {
     private readonly IPayrollRecordService _payrollRecordService;

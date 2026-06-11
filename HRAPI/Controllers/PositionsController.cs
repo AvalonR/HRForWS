@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Exposes position endpoints and keeps department/duplicate validation inside the service layer.
 public class PositionsController : ApiControllerBase
 {
     private readonly IPositionService _positionService;

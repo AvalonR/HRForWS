@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRAPI.Models;
 
+// Employee is the central HR profile connected to departments, positions, managers, and records.
 public class Employee
 {
     public int Id { get; set; }
@@ -49,6 +50,7 @@ public class Employee
     [ForeignKey(nameof(PositionId))]
     public Position Position { get; set; } = null!;
 
+    // Manager is another employee, which represents the reporting structure.
     public int? ManagerId { get; set; }
     [ForeignKey(nameof(ManagerId))]
     public Employee? Manager { get; set; }

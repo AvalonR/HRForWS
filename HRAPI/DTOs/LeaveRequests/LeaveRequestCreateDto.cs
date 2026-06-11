@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.LeaveRequests;
 
+// DTO used when creating a leave request; the service sets new requests to Pending.
 public class LeaveRequestCreateDto
 {
     [Range(1, int.MaxValue)]

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRAPI.Models;
 
+// Department groups employees and can optionally belong to another department.
 public class Department
 {
     public int Id { get; set; }
@@ -18,6 +19,7 @@ public class Department
     [MaxLength(500)]
     public string? Description { get; set; }
 
+    // Self-reference supports department trees, such as HR containing Recruiting.
     public int? ParentDepartmentId { get; set; }
 
     [ForeignKey(nameof(ParentDepartmentId))]

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Handles leave request endpoints while the service validates dates and related employees/types.
 public class LeaveRequestsController : ApiControllerBase
 {
     private readonly ILeaveRequestService _leaveRequestService;

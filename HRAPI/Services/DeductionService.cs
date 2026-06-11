@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Handles deduction validation and ensures each deduction belongs to a payroll record.
 public class DeductionService : IDeductionService
 {
     private readonly AppDbContext _context;

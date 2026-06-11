@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// PerformanceReview stores an employee evaluation and the employee who reviewed it.
 public class PerformanceReview
 {
     public int Id { get; set; }

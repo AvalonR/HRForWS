@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRAPI.Models;
 
+// Position represents a job title inside a department, with optional salary range guidance.
 public class Position
 {
     public int Id { get; set; }

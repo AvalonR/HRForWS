@@ -2,6 +2,7 @@ using HRAPI.DTOs.Departments;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for department operations used by DepartmentsController.
 public interface IDepartmentService
 {
     Task<List<DepartmentReadDto>> GetAllAsync();

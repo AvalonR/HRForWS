@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Manages leave type rules, including duplicate names and safe deletion.
 public class LeaveTypeService : ILeaveTypeService
 {
     private readonly AppDbContext _context;

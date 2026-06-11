@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Contains position rules such as salary range validation and department ownership.
 public class PositionService : IPositionService
 {
     private readonly AppDbContext _context;

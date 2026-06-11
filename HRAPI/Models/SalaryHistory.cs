@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRAPI.Models;
 
+// SalaryHistory records salary changes over time instead of overwriting old values.
 public class SalaryHistory
 {
     public int Id { get; set; }

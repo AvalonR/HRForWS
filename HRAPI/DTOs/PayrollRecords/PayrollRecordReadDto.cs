@@ -2,6 +2,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.PayrollRecords;
 
+// DTO returned for payroll records with employee name and payroll values.
 public class PayrollRecordReadDto
 {
     public int Id { get; set; }
