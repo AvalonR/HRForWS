@@ -23,6 +23,7 @@ builder.Services.AddScoped<IPayrollRecordService, PayrollRecordService>();
 builder.Services.AddScoped<ISalaryHistoryService, SalaryHistoryService>();
 builder.Services.AddScoped<IPerformanceReviewService, PerformanceReviewService>();
 builder.Services.AddScoped<IDeductionService, DeductionService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     // password policy

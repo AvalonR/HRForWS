@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HRAPI.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class DepartmentsController : ControllerBase
+public class DepartmentsController : ApiControllerBase
 {
     private readonly IDepartmentService _departmentService;
 
@@ -61,13 +60,4 @@ public class DepartmentsController : ControllerBase
         return ToActionResult(result);
     }
 
-    private IActionResult ToActionResult(ServiceResult result)
-    {
-        if (result.Succeeded)
-        {
-            return NoContent();
-        }
-
-        return result.NotFound ? NotFound() : BadRequest(result.ErrorMessage);
-    }
 }
