@@ -28,6 +28,9 @@ obj/
 # Logs
 *.log
 
+# Vite build cache
+.vite/
+
 # OS files
 .DS_Store
 Thumbs.db

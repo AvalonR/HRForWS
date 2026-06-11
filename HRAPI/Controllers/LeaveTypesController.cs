@@ -3,6 +3,7 @@ using HRAPI.DTOs.LeaveTypes;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class LeaveTypesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
     public async Task<ActionResult<IEnumerable<LeaveTypeReadDto>>> GetLeaveTypes()
     {
         var leaveTypes = await _context.LeaveTypes
@@ -35,6 +37,7 @@ public class LeaveTypesController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
     public async Task<ActionResult<LeaveTypeReadDto>> GetLeaveType(int id)
     {
         var leaveType = await _context.LeaveTypes
@@ -58,6 +61,7 @@ public class LeaveTypesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<LeaveTypeReadDto>> CreateLeaveType(LeaveTypeCreateDto createDto)
     {
         var nameExists = await _context.LeaveTypes
@@ -90,6 +94,7 @@ public class LeaveTypesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateLeaveType(int id, LeaveTypeUpdateDto updateDto)
     {
         var leaveType = await _context.LeaveTypes.FindAsync(id);
@@ -117,6 +122,7 @@ public class LeaveTypesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteLeaveType(int id)
     {
         var leaveType = await _context.LeaveTypes.FindAsync(id);

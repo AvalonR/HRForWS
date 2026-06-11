@@ -3,6 +3,7 @@ using HRAPI.DTOs.Departments;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<IEnumerable<DepartmentReadDto>>> GetDepartments()
     {
         var departments = await _context.Departments
@@ -39,6 +41,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<DepartmentReadDto>> GetDepartment(int id)
     {
         var department = await _context.Departments
@@ -66,6 +69,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<DepartmentReadDto>> CreateDepartment(DepartmentCreateDto createDto)
     {
         if (createDto.ParentDepartmentId.HasValue)
@@ -116,6 +120,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateDepartment(int id, DepartmentUpdateDto updateDto)
     {
         var department = await _context.Departments.FindAsync(id);
@@ -162,6 +167,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteDepartment(int id)
     {
         var department = await _context.Departments.FindAsync(id);

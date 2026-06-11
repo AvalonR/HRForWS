@@ -3,6 +3,9 @@ using HRAPI.DTOs.Employees;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace HRAPI.Controllers;
 
@@ -11,13 +14,16 @@ namespace HRAPI.Controllers;
 public class EmployeesController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly UserManager<AppUser> _userManager;
 
-    public EmployeesController(AppDbContext context)
+    public EmployeesController(AppDbContext context, UserManager<AppUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<IEnumerable<EmployeeReadDto>>> GetEmployees()
     {
         var employees = await _context.Employees
@@ -57,8 +63,18 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize]
     public async Task<ActionResult<EmployeeReadDto>> GetEmployee(int id)
     {
+        var isAdmin = User.IsInRole("Admin");
+        var isHr = User.IsInRole("HRManager");
+        var isTeamLead = User.IsInRole("TeamLead");
+        var currentUser = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email)!);
+        bool canView = isAdmin || isHr || isTeamLead ||
+            (currentUser?.EmployeeId == id);
+
+        if (!canView) return Forbid();
+
         var employee = await _context.Employees
             .AsNoTracking()
             .Include(e => e.Department)
@@ -102,6 +118,7 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<EmployeeReadDto>> CreateEmployee(EmployeeCreateDto createDto)
     {
         if (createDto.TerminationDate.HasValue && createDto.TerminationDate < createDto.HireDate)
@@ -215,6 +232,7 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdateEmployee(int id, EmployeeUpdateDto updateDto)
     {
         if (updateDto.ManagerId == id)
@@ -307,6 +325,7 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteEmployee(int id)
     {
         var employee = await _context.Employees.FindAsync(id);

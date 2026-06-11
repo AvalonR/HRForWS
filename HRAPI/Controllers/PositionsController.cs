@@ -3,6 +3,7 @@ using HRAPI.DTOs.Positions;
 using HRAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class PositionsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<IEnumerable<PositionReadDto>>> GetPositions()
     {
         var positions = await _context.Positions
@@ -42,6 +44,7 @@ public class PositionsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager,TeamLead")]
     public async Task<ActionResult<PositionReadDto>> GetPosition(int id)
     {
         var position = await _context.Positions
@@ -72,6 +75,7 @@ public class PositionsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<ActionResult<PositionReadDto>> CreatePosition(PositionCreateDto createDto)
     {
         if (createDto.MinSalary.HasValue && createDto.MaxSalary.HasValue &&
@@ -128,6 +132,7 @@ public class PositionsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,HRManager")]
     public async Task<IActionResult> UpdatePosition(int id, PositionUpdateDto updateDto)
     {
         if (updateDto.MinSalary.HasValue && updateDto.MaxSalary.HasValue &&
@@ -175,6 +180,7 @@ public class PositionsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePosition(int id)
     {
         var position = await _context.Positions.FindAsync(id);
