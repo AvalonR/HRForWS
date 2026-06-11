@@ -9,9 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HRAPI.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class EmployeesController : ControllerBase
+public class EmployeesController : ApiControllerBase
 {
     private readonly IEmployeeService _employeeService;
     private readonly UserManager<AppUser> _userManager;
@@ -77,13 +76,4 @@ public class EmployeesController : ControllerBase
         return ToActionResult(result);
     }
 
-    private IActionResult ToActionResult(ServiceResult result)
-    {
-        if (result.Succeeded)
-        {
-            return NoContent();
-        }
-
-        return result.NotFound ? NotFound() : BadRequest(result.ErrorMessage);
-    }
 }
