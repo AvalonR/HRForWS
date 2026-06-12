@@ -15,30 +15,70 @@ public class DeductionsController : ApiControllerBase
         _deductionService = deductionService;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "GetDeductions")]
     [Authorize(Roles = "Admin,HRManager")]
-    public async Task<ActionResult<IEnumerable<DeductionReadDto>>> GetDeductions()
+    public async Task<IActionResult> GetDeductions()
     {
-        return Ok(await _deductionService.GetAllAsync());
+        var items = await _deductionService.GetAllAsync();
+        var collectionLinks = Links(
+            ("self",   Url?.Link("GetDeductions", null), "GET"),
+            ("create", Url?.Action(nameof(CreateDeduction)), "POST")
+        );
+        var result = new
+        {
+            items = items.Select(d => new
+            {
+                d.Id, d.PayrollRecordId,
+                d.EmployeeId, d.EmployeeName,
+                d.Type, d.Amount, d.Description,
+                _links = Links(
+                    ("self",   Url?.Action(nameof(GetDeduction), new { id = d.Id }), "GET"),
+                    ("update", Url?.Action(nameof(UpdateDeduction), new { id = d.Id }), "PUT"),
+                    ("delete", Url?.Action(nameof(DeleteDeduction), new { id = d.Id }), "DELETE")
+                )
+            }),
+            _links = collectionLinks
+        };
+        return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetDeduction")]
     [Authorize(Roles = "Admin,HRManager")]
-    public async Task<ActionResult<DeductionReadDto>> GetDeduction(int id)
+    public async Task<IActionResult> GetDeduction(int id)
     {
         var deduction = await _deductionService.GetByIdAsync(id);
-        return deduction == null ? NotFound() : Ok(deduction);
+        if (deduction == null) return NotFound();
+        var result = new
+        {
+            data = deduction,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetDeduction), new { id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateDeduction), new { id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteDeduction), new { id }), "DELETE")
+            )
+        };
+        return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,HRManager")]
-    public async Task<ActionResult<DeductionReadDto>> CreateDeduction(DeductionCreateDto createDto)
+    public async Task<IActionResult> CreateDeduction(DeductionCreateDto createDto)
     {
         var result = await _deductionService.CreateAsync(createDto);
         if (!result.Succeeded)
             return BadRequest(result.ErrorMessage);
 
-        return CreatedAtAction(nameof(GetDeduction), new { id = result.Data!.Id }, result.Data);
+        var data = result.Data!;
+        var resource = new
+        {
+            data,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetDeduction), new { id = data.Id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateDeduction), new { id = data.Id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteDeduction), new { id = data.Id }), "DELETE")
+            )
+        };
+        return CreatedAtAction(nameof(GetDeduction), new { id = data.Id }, resource);
     }
 
     [HttpPut("{id:int}")]

@@ -13,7 +13,15 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data?.items !== undefined) {
+      response.data = response.data.items;
+    }
+    if (response.data?.data !== undefined && response.data?._links !== undefined) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401 && !error.config?.url?.includes("/auth/login")) {
       localStorage.removeItem("token");

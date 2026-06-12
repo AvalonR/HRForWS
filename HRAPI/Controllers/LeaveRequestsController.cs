@@ -16,32 +16,73 @@ public class LeaveRequestsController : ApiControllerBase
         _leaveRequestService = leaveRequestService;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "GetLeaveRequests")]
     [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
-    public async Task<ActionResult<IEnumerable<LeaveRequestReadDto>>> GetLeaveRequests()
+    public async Task<IActionResult> GetLeaveRequests()
     {
-        return Ok(await _leaveRequestService.GetAllAsync());
+        var items = await _leaveRequestService.GetAllAsync();
+        var collectionLinks = Links(
+            ("self",   Url?.Link("GetLeaveRequests", null), "GET"),
+            ("create", Url?.Action(nameof(CreateLeaveRequest)), "POST")
+        );
+        var result = new
+        {
+            items = items.Select(d => new
+            {
+                d.Id, d.EmployeeId, d.EmployeeName,
+                d.LeaveTypeId, d.LeaveTypeName,
+                d.StartDate, d.EndDate,
+                d.Status, d.Reason, d.DateRequested,
+                d.ReviewedByEmployeeId, d.ReviewedByEmployeeName,
+                d.CreatedAt, d.UpdatedAt,
+                _links = Links(
+                    ("self",   Url?.Action(nameof(GetLeaveRequest), new { id = d.Id }), "GET"),
+                    ("update", Url?.Action(nameof(UpdateLeaveRequest), new { id = d.Id }), "PUT"),
+                    ("delete", Url?.Action(nameof(DeleteLeaveRequest), new { id = d.Id }), "DELETE")
+                )
+            }),
+            _links = collectionLinks
+        };
+        return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetLeaveRequest")]
     [Authorize(Roles = "Admin,HRManager,TeamLead,Employee")]
-    public async Task<ActionResult<LeaveRequestReadDto>> GetLeaveRequest(int id)
+    public async Task<IActionResult> GetLeaveRequest(int id)
     {
         var leaveRequest = await _leaveRequestService.GetByIdAsync(id);
-        return leaveRequest == null ? NotFound() : Ok(leaveRequest);
+        if (leaveRequest == null) return NotFound();
+        var result = new
+        {
+            data = leaveRequest,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetLeaveRequest), new { id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateLeaveRequest), new { id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteLeaveRequest), new { id }), "DELETE")
+            )
+        };
+        return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,HRManager,Employee")]
-    public async Task<ActionResult<LeaveRequestReadDto>> CreateLeaveRequest(LeaveRequestCreateDto createDto)
+    public async Task<IActionResult> CreateLeaveRequest(LeaveRequestCreateDto createDto)
     {
         var result = await _leaveRequestService.CreateAsync(createDto);
         if (!result.Succeeded)
-        {
             return BadRequest(result.ErrorMessage);
-        }
 
-        return CreatedAtAction(nameof(GetLeaveRequest), new { id = result.Data!.Id }, result.Data);
+        var data = result.Data!;
+        var resource = new
+        {
+            data,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetLeaveRequest), new { id = data.Id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateLeaveRequest), new { id = data.Id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteLeaveRequest), new { id = data.Id }), "DELETE")
+            )
+        };
+        return CreatedAtAction(nameof(GetLeaveRequest), new { id = data.Id }, resource);
     }
 
     [HttpPut("{id:int}")]

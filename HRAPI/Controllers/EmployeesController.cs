@@ -21,16 +21,40 @@ public class EmployeesController : ApiControllerBase
         _userManager = userManager;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "GetEmployees")]
     [Authorize(Roles = "Admin,HRManager,TeamLead")]
-    public async Task<ActionResult<IEnumerable<EmployeeReadDto>>> GetEmployees()
+    public async Task<IActionResult> GetEmployees()
     {
-        return Ok(await _employeeService.GetAllAsync());
+        var items = await _employeeService.GetAllAsync();
+        var collectionLinks = Links(
+            ("self",   Url?.Link("GetEmployees", null), "GET"),
+            ("create", Url?.Action(nameof(CreateEmployee)), "POST")
+        );
+        var result = new
+        {
+            items = items.Select(d => new
+            {
+                d.Id, d.EmployeeNumber, d.FirstName, d.LastName, d.FullName,
+                d.Email, d.Phone, d.DateOfBirth, d.HireDate, d.TerminationDate,
+                d.Address, d.City, d.State, d.PostalCode, d.Country,
+                d.DepartmentId, d.DepartmentName,
+                d.PositionId, d.PositionTitle,
+                d.ManagerId, d.ManagerName,
+                d.IsActive, d.CreatedAt, d.UpdatedAt,
+                _links = Links(
+                    ("self",   Url?.Action(nameof(GetEmployee), new { id = d.Id }), "GET"),
+                    ("update", Url?.Action(nameof(UpdateEmployee), new { id = d.Id }), "PUT"),
+                    ("delete", Url?.Action(nameof(DeleteEmployee), new { id = d.Id }), "DELETE")
+                )
+            }),
+            _links = collectionLinks
+        };
+        return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetEmployee")]
     [Authorize]
-    public async Task<ActionResult<EmployeeReadDto>> GetEmployee(int id)
+    public async Task<IActionResult> GetEmployee(int id)
     {
         var isAdmin = User.IsInRole("Admin");
         var isHr = User.IsInRole("HRManager");
@@ -39,25 +63,41 @@ public class EmployeesController : ApiControllerBase
         var canView = isAdmin || isHr || isTeamLead || currentUser?.EmployeeId == id;
 
         if (!canView)
-        {
             return Forbid();
-        }
 
         var employee = await _employeeService.GetByIdAsync(id);
-        return employee == null ? NotFound() : Ok(employee);
+        if (employee == null) return NotFound();
+        var result = new
+        {
+            data = employee,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetEmployee), new { id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateEmployee), new { id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteEmployee), new { id }), "DELETE")
+            )
+        };
+        return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,HRManager")]
-    public async Task<ActionResult<EmployeeReadDto>> CreateEmployee(EmployeeCreateDto createDto)
+    public async Task<IActionResult> CreateEmployee(EmployeeCreateDto createDto)
     {
         var result = await _employeeService.CreateAsync(createDto);
         if (!result.Succeeded)
-        {
             return BadRequest(result.ErrorMessage);
-        }
 
-        return CreatedAtAction(nameof(GetEmployee), new { id = result.Data!.Id }, result.Data);
+        var data = result.Data!;
+        var resource = new
+        {
+            data,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetEmployee), new { id = data.Id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateEmployee), new { id = data.Id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteEmployee), new { id = data.Id }), "DELETE")
+            )
+        };
+        return CreatedAtAction(nameof(GetEmployee), new { id = data.Id }, resource);
     }
 
     [HttpPut("{id:int}")]

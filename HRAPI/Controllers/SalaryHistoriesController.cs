@@ -15,30 +15,70 @@ public class SalaryHistoriesController : ApiControllerBase
         _salaryHistoryService = salaryHistoryService;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "GetSalaryHistories")]
     [Authorize(Roles = "Admin,HRManager,TeamLead")]
-    public async Task<ActionResult<IEnumerable<SalaryHistoryReadDto>>> GetSalaryHistories()
+    public async Task<IActionResult> GetSalaryHistories()
     {
-        return Ok(await _salaryHistoryService.GetAllAsync());
+        var items = await _salaryHistoryService.GetAllAsync();
+        var collectionLinks = Links(
+            ("self",   Url?.Link("GetSalaryHistories", null), "GET"),
+            ("create", Url?.Action(nameof(CreateSalaryHistory)), "POST")
+        );
+        var result = new
+        {
+            items = items.Select(d => new
+            {
+                d.Id, d.EmployeeId, d.EmployeeName,
+                d.Amount, d.EffectiveFrom, d.EffectiveTo,
+                d.ChangeReason, d.CreatedAt, d.UpdatedAt,
+                _links = Links(
+                    ("self",   Url?.Action(nameof(GetSalaryHistory), new { id = d.Id }), "GET"),
+                    ("update", Url?.Action(nameof(UpdateSalaryHistory), new { id = d.Id }), "PUT"),
+                    ("delete", Url?.Action(nameof(DeleteSalaryHistory), new { id = d.Id }), "DELETE")
+                )
+            }),
+            _links = collectionLinks
+        };
+        return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetSalaryHistory")]
     [Authorize(Roles = "Admin,HRManager,TeamLead")]
-    public async Task<ActionResult<SalaryHistoryReadDto>> GetSalaryHistory(int id)
+    public async Task<IActionResult> GetSalaryHistory(int id)
     {
         var salaryHistory = await _salaryHistoryService.GetByIdAsync(id);
-        return salaryHistory == null ? NotFound() : Ok(salaryHistory);
+        if (salaryHistory == null) return NotFound();
+        var result = new
+        {
+            data = salaryHistory,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetSalaryHistory), new { id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateSalaryHistory), new { id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteSalaryHistory), new { id }), "DELETE")
+            )
+        };
+        return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,HRManager")]
-    public async Task<ActionResult<SalaryHistoryReadDto>> CreateSalaryHistory(SalaryHistoryCreateDto createDto)
+    public async Task<IActionResult> CreateSalaryHistory(SalaryHistoryCreateDto createDto)
     {
         var result = await _salaryHistoryService.CreateAsync(createDto);
         if (!result.Succeeded)
             return BadRequest(result.ErrorMessage);
 
-        return CreatedAtAction(nameof(GetSalaryHistory), new { id = result.Data!.Id }, result.Data);
+        var data = result.Data!;
+        var resource = new
+        {
+            data,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetSalaryHistory), new { id = data.Id }), "GET"),
+                ("update", Url?.Action(nameof(UpdateSalaryHistory), new { id = data.Id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeleteSalaryHistory), new { id = data.Id }), "DELETE")
+            )
+        };
+        return CreatedAtAction(nameof(GetSalaryHistory), new { id = data.Id }, resource);
     }
 
     [HttpPut("{id:int}")]
