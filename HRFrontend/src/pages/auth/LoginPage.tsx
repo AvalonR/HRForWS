@@ -23,8 +23,17 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-    } catch {
-      setError("Invalid email or password.");
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number }; message?: string };
+      if (axiosErr.response?.status === 401) {
+        setError("Invalid email or password.");
+      } else if (axiosErr.response) {
+        setError("Server error. Please try again later.");
+      } else if (axiosErr.message?.includes("Network Error")) {
+        setError("Unable to reach the server. Check your connection.");
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }

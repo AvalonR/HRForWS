@@ -11,70 +11,66 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import {
-  getDepartments,
-  deleteDepartment,
-} from "../../services/DepartmentService";
-import type { DepartmentReadDto } from "../../types/dto";
+  getPositions,
+  deletePosition,
+} from "../../services/PositionService";
+import type { PositionReadDto } from "../../types/dto";
 import { useAuth } from "../../contexts/AuthContext";
 import { getErrorMessage } from "../../utils/errorUtils";
-import DepartmentFormDialog from "./DepartmentFormDialog";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import PositionFormDialog from "./PositionFormDialog";
+import DeleteConfirmDialog from "../departments/DeleteConfirmDialog";
 
-export default function DepartmentsList() {
+export default function PositionsList() {
   const { user } = useAuth();
   const canCreate = user?.roles.some((r) => r === "Admin" || r === "HRManager");
   const canEdit = canCreate;
   const canDelete = user?.roles.includes("Admin");
-  const [departments, setDepartments] = useState<DepartmentReadDto[]>([]);
+  const [positions, setPositions] = useState<PositionReadDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [editingDept, setEditingDept] = useState<DepartmentReadDto | null>(
-    null,
-  );
-  const [deleteTarget, setDeleteTarget] = useState<DepartmentReadDto | null>(
-    null,
-  );
+  const [editingPos, setEditingPos] = useState<PositionReadDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<PositionReadDto | null>(null);
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  const fetchDepartments = useCallback(async () => {
+  const fetchPositions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getDepartments();
-      setDepartments(data);
+      const data = await getPositions();
+      setPositions(data);
     } catch {
-      setError("Failed to load departments.");
+      setError("Failed to load positions.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchDepartments();
-  }, [fetchDepartments]);
+    fetchPositions();
+  }, [fetchPositions]);
 
   const handleAdd = () => {
-    setEditingDept(null);
+    setEditingPos(null);
     setFormOpen(true);
   };
 
-  const handleEdit = (dept: DepartmentReadDto) => {
-    setEditingDept(dept);
+  const handleEdit = (pos: PositionReadDto) => {
+    setEditingPos(pos);
     setFormOpen(true);
   };
 
   const handleFormSaved = () => {
     setFormOpen(false);
-    setEditingDept(null);
-    fetchDepartments();
+    setEditingPos(null);
+    fetchPositions();
     setSnackbar({
-      message: editingDept
-        ? "Department updated successfully"
-        : "Department created successfully",
+      message: editingPos
+        ? "Position updated successfully"
+        : "Position created successfully",
       severity: "success",
     });
   };
@@ -82,22 +78,21 @@ export default function DepartmentsList() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteDepartment(deleteTarget.id);
+      await deletePosition(deleteTarget.id);
       setDeleteTarget(null);
-      fetchDepartments();
+      fetchPositions();
       setSnackbar({
-        message: "Department deleted successfully",
+        message: "Position deleted successfully",
         severity: "success",
       });
     } catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to delete department.");
+      const message = getErrorMessage(err, "Failed to delete position.");
       setSnackbar({ message, severity: "error" });
     }
   };
 
-  const columns: GridColDef<DepartmentReadDto>[] = [
-    { field: "code", headerName: "Code", width: 100 },
-    { field: "name", headerName: "Name", flex: 1, minWidth: 200 },
+  const columns: GridColDef<PositionReadDto>[] = [
+    { field: "title", headerName: "Title", flex: 1, minWidth: 200 },
     {
       field: "description",
       headerName: "Description",
@@ -105,16 +100,23 @@ export default function DepartmentsList() {
       minWidth: 200,
     },
     {
-      field: "parentDepartmentId",
-      headerName: "Parent Department",
-      width: 180,
-      valueGetter: (_, row) => {
-        if (!row.parentDepartmentId) return null;
-        const parent = departments.find(
-          (d) => d.id === row.parentDepartmentId,
-        );
-        return parent?.name ?? null;
-      },
+      field: "departmentName",
+      headerName: "Department",
+      width: 160,
+    },
+    {
+      field: "minSalary",
+      headerName: "Min Salary",
+      width: 120,
+      valueFormatter: (value?: number | null) =>
+        value != null ? `$${value.toLocaleString()}` : "-",
+    },
+    {
+      field: "maxSalary",
+      headerName: "Max Salary",
+      width: 120,
+      valueFormatter: (value?: number | null) =>
+        value != null ? `$${value.toLocaleString()}` : "-",
     },
     {
       field: "isActive",
@@ -170,7 +172,7 @@ export default function DepartmentsList() {
     return (
       <Box sx={{ p: 2 }}>
         <Typography color="error">{error}</Typography>
-        <Button onClick={fetchDepartments} sx={{ mt: 1 }}>
+        <Button onClick={fetchPositions} sx={{ mt: 1 }}>
           Retry
         </Button>
       </Box>
@@ -187,16 +189,16 @@ export default function DepartmentsList() {
           mb: 2,
         }}
       >
-        <Typography variant="h4">Departments</Typography>
+        <Typography variant="h4">Positions</Typography>
         {canCreate && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            Add Department
+            Add Position
           </Button>
         )}
       </Box>
 
       <DataGrid
-        rows={departments}
+        rows={positions}
         columns={columns}
         loading={loading}
         autoHeight
@@ -204,18 +206,17 @@ export default function DepartmentsList() {
         pageSizeOptions={[10, 25, 50]}
         initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
         getRowId={(row) => row.id}
-        localeText={{ noRowsLabel: "No departments found" }}
+        localeText={{ noRowsLabel: "No positions found" }}
       />
 
       {formOpen && (
-        <DepartmentFormDialog
+        <PositionFormDialog
           open={formOpen}
-          department={editingDept}
-          departments={departments}
+          position={editingPos}
           onSaved={handleFormSaved}
           onClose={() => {
             setFormOpen(false);
-            setEditingDept(null);
+            setEditingPos(null);
           }}
         />
       )}
@@ -223,8 +224,8 @@ export default function DepartmentsList() {
       {deleteTarget && (
         <DeleteConfirmDialog
           open={!!deleteTarget}
-          title="Delete Department"
-          message={`Are you sure you want to delete "${deleteTarget.name}"?`}
+          title="Delete Position"
+          message={`Are you sure you want to delete "${deleteTarget.title}"?`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />

@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import AppBar from "@mui/material/AppBar";
@@ -11,11 +11,18 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
 import BusinessIcon from "@mui/icons-material/Business";
 import GroupIcon from "@mui/icons-material/Group";
 import WorkIcon from "@mui/icons-material/Work";
 import EventNoteIcon from "@mui/icons-material/EventNote";
-import LogoutIcon from "@mui/icons-material/Logout";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 
 const DRAWER_WIDTH = 240;
 
@@ -31,16 +38,23 @@ const allNavItems: NavItem[] = [
   { label: "Positions", path: "/positions", icon: <WorkIcon />, roles: ["Admin", "HRManager", "TeamLead"] },
   { label: "Employees", path: "/employees", icon: <GroupIcon />, roles: ["Admin", "HRManager", "TeamLead"] },
   { label: "Leave", path: "/leave", icon: <EventNoteIcon />, roles: ["Admin", "HRManager", "TeamLead", "Employee"] },
+  { label: "Attendance", path: "/attendance", icon: <CalendarMonthIcon />, roles: ["Admin", "HRManager", "TeamLead"] },
+  { label: "Payroll", path: "/payroll", icon: <AttachMoneyIcon />, roles: ["Admin", "HRManager"] },
+  { label: "Salary History", path: "/salary-history", icon: <TrendingUpIcon />, roles: ["Admin", "HRManager", "TeamLead"] },
+  { label: "Performance Reviews", path: "/performance-reviews", icon: <RateReviewIcon />, roles: ["Admin", "HRManager", "TeamLead"] },
 ];
 
 export default function MainLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const visibleItems = allNavItems.filter(
     (item) => user && item.roles.some((r) => user.roles.includes(r))
   );
+
+  const initials = user?.email ? user.email[0].toUpperCase() : "?";
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -49,9 +63,31 @@ export default function MainLayout() {
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
             HR Management System
           </Typography>
-          <IconButton color="inherit" onClick={logout}>
-            <LogoutIcon />
+          <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: "secondary.main", fontSize: 16 }}>
+              {initials}
+            </Avatar>
           </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={!!anchorEl}
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            <MenuItem disabled sx={{ opacity: 1 }}>
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>{user?.email}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {user?.roles.join(", ")}
+                </Typography>
+              </Box>
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={() => { setAnchorEl(null); logout(); }}>
+              Logout
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
 
