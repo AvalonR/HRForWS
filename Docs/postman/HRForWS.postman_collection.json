@@ -1,0 +1,271 @@
+{
+  "info": {
+    "name": "HRForWS API",
+    "description": "Postman collection for the main HRForWS API endpoints. Run Auth Login first, then use the saved bearer token for protected requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5065"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "departmentId",
+      "value": "1"
+    },
+    {
+      "key": "positionId",
+      "value": "1"
+    },
+    {
+      "key": "employeeId",
+      "value": "1"
+    },
+    {
+      "key": "leaveTypeId",
+      "value": "1"
+    },
+    {
+      "key": "leaveRequestId",
+      "value": "1"
+    },
+    {
+      "key": "attendanceId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login as Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login succeeded', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('token', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@hr.com\",\n  \"password\": \"Admin123!\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Departments",
+      "item": [
+        {
+          "name": "List Departments",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/departments"
+          }
+        },
+        {
+          "name": "Get Department",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/departments/{{departmentId}}"
+          }
+        },
+        {
+          "name": "Create Department",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Postman Department\",\n  \"code\": \"PM-DEPT\",\n  \"description\": \"Created from Postman\",\n  \"parentDepartmentId\": null\n}" },
+            "url": "{{baseUrl}}/api/departments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Positions",
+      "item": [
+        {
+          "name": "List Positions",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/positions"
+          }
+        },
+        {
+          "name": "Create Position",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Postman Position\",\n  \"description\": \"Created from Postman\",\n  \"minSalary\": 1000,\n  \"maxSalary\": 2000,\n  \"departmentId\": {{departmentId}}\n}" },
+            "url": "{{baseUrl}}/api/positions"
+          }
+        },
+        {
+          "name": "Get Position",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/positions/{{positionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "List Employees",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/employees"
+          }
+        },
+        {
+          "name": "Create Employee",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"employeeNumber\": \"PM-001\",\n  \"firstName\": \"Postman\",\n  \"lastName\": \"Employee\",\n  \"email\": \"postman.employee@example.com\",\n  \"phone\": \"5550100\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"hireDate\": \"2026-06-12\",\n  \"terminationDate\": null,\n  \"address\": \"Demo Street 1\",\n  \"city\": \"Vilnius\",\n  \"state\": \"Vilnius\",\n  \"postalCode\": \"00000\",\n  \"country\": \"Lithuania\",\n  \"departmentId\": {{departmentId}},\n  \"positionId\": {{positionId}},\n  \"managerId\": null\n}" },
+            "url": "{{baseUrl}}/api/employees"
+          }
+        },
+        {
+          "name": "Get Employee",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/employees/{{employeeId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "LeaveTypes",
+      "item": [
+        {
+          "name": "List Leave Types",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/leavetypes"
+          }
+        },
+        {
+          "name": "Get Leave Type",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/leavetypes/{{leaveTypeId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "LeaveRequests",
+      "item": [
+        {
+          "name": "List Leave Requests",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/leaverequests"
+          }
+        },
+        {
+          "name": "Create Leave Request",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"employeeId\": {{employeeId}},\n  \"leaveTypeId\": {{leaveTypeId}},\n  \"startDate\": \"2026-07-01\",\n  \"endDate\": \"2026-07-03\",\n  \"reason\": \"Postman test\"\n}" },
+            "url": "{{baseUrl}}/api/leaverequests"
+          }
+        },
+        {
+          "name": "Get Leave Request",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/leaverequests/{{leaveRequestId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendances",
+      "item": [
+        {
+          "name": "List Attendances",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/attendances"
+          }
+        },
+        {
+          "name": "Create Attendance",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"employeeId\": {{employeeId}},\n  \"date\": \"2026-07-10\",\n  \"checkIn\": \"09:00:00\",\n  \"checkOut\": \"17:00:00\",\n  \"status\": 0,\n  \"notes\": \"Postman test\"\n}" },
+            "url": "{{baseUrl}}/api/attendances"
+          }
+        },
+        {
+          "name": "Get Attendance",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/attendances/{{attendanceId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
