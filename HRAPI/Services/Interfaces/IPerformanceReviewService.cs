@@ -2,6 +2,7 @@ using HRAPI.DTOs.PerformanceReviews;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for performance review operations used by PerformanceReviewsController.
 public interface IPerformanceReviewService
 {
     Task<List<PerformanceReviewReadDto>> GetAllAsync();

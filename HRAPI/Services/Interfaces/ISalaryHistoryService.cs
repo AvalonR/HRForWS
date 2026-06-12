@@ -2,6 +2,7 @@ using HRAPI.DTOs.SalaryHistories;
 
 namespace HRAPI.Services.Interfaces;
 
+// Contract for salary history operations used by SalaryHistoriesController.
 public interface ISalaryHistoryService
 {
     Task<List<SalaryHistoryReadDto>> GetAllAsync();

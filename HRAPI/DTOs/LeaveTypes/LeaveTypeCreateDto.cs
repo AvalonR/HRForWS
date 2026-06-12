@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.LeaveTypes;
 
+// DTO used to create leave categories such as annual or sick leave.
 public class LeaveTypeCreateDto
 {
     [Required]

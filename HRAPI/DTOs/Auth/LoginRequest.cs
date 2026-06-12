@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRAPI.DTOs.Auth;
 
+// DTO sent by the client when requesting a JWT token.
 public class LoginRequest
 {
     [Required]

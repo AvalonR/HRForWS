@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.PerformanceReviews;
 
+// DTO used to update rating, feedback, goals, status, and next review date.
 public class PerformanceReviewUpdateDto
 {
     [Range(1, int.MaxValue)]

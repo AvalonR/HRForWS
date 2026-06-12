@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OutputCaching;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Manages leave type definitions such as annual, sick, and personal leave.
 public class LeaveTypesController : ApiControllerBase
 {
     private readonly ILeaveTypeService _leaveTypeService;

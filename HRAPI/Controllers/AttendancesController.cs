@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Handles attendance endpoints such as present, absent, late, remote, and on-leave records.
 public class AttendancesController : ApiControllerBase
 {
     private readonly IAttendanceService _attendanceService;

@@ -4,6 +4,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// Recruiting model for interview scheduling and feedback.
 public class Interview
 {
     public int Id { get; set; }

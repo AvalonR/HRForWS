@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// Leave request connects an employee to a leave type for a specific date range.
 public class LeaveRequest
 {
     public int Id { get; set; }
@@ -27,6 +28,7 @@ public class LeaveRequest
 
     public DateTime DateRequested { get; set; }
 
+    // Optional reviewer is filled when HR reviews the request.
     public int? ReviewedByEmployeeId { get; set; }
 
     [ForeignKey(nameof(ReviewedByEmployeeId))]

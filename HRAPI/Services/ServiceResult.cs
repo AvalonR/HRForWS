@@ -1,5 +1,6 @@
 namespace HRAPI.Services;
 
+// Represents expected service outcomes such as success, validation failure, or missing record.
 public class ServiceResult
 {
     public bool Succeeded { get; init; }
@@ -11,6 +12,7 @@ public class ServiceResult
     public static ServiceResult Missing() => new() { NotFound = true };
 }
 
+// Generic result also carries DTO data for successful create/read-like operations.
 public class ServiceResult<T> : ServiceResult
 {
     public T? Data { get; init; }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Handles attendance rules, especially one record per employee per date.
 public class AttendanceService : IAttendanceService
 {
     private readonly AppDbContext _context;
@@ -42,6 +43,7 @@ public class AttendanceService : IAttendanceService
             return ServiceResult<AttendanceReadDto>.Failure("Employee does not exist.");
         }
 
+        // Prevents two attendance records for the same employee on the same date.
         var duplicateExists = await _context.Attendances.AnyAsync(a => a.EmployeeId == dto.EmployeeId && a.Date == dto.Date);
         if (duplicateExists)
         {

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Handles payroll validation for pay periods, amounts, and net pay consistency.
 public class PayrollRecordService : IPayrollRecordService
 {
     private readonly AppDbContext _context;
@@ -131,6 +132,7 @@ public class PayrollRecordService : IPayrollRecordService
         return ServiceResult.Success();
     }
 
+    // Payroll validation keeps stored net pay consistent with salary, additions, and deductions.
     private static string? ValidatePayrollValues(
         DateOnly payPeriodStart, DateOnly payPeriodEnd,
         decimal baseSalary, decimal overtime, decimal bonuses,

@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.Models;
 
+// Deduction represents an amount subtracted from a specific payroll record.
 public class Deduction
 {
     public int Id { get; set; }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.OutputCaching;
 namespace HRAPI.Controllers;
 
 [ApiController]
+// Shared controller base that converts service-layer results into standard HTTP responses.
 public abstract class ApiControllerBase : ControllerBase
 {
     protected IActionResult ToActionResult(ServiceResult result)

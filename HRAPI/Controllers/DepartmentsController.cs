@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OutputCaching;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Exposes department CRUD endpoints while DepartmentService handles validation and database work.
 public class DepartmentsController : ApiControllerBase
 {
     private readonly IDepartmentService _departmentService;

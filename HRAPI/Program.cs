@@ -10,9 +10,11 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Registers EF Core with SQLite so services can query and save HR data through AppDbContext.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Registers the service layer so controllers stay focused on HTTP requests and responses.
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
@@ -24,6 +26,8 @@ builder.Services.AddScoped<ISalaryHistoryService, SalaryHistoryService>();
 builder.Services.AddScoped<IPerformanceReviewService, PerformanceReviewService>();
 builder.Services.AddScoped<IDeductionService, DeductionService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Identity manages application users, password hashes, roles, and role membership tables.
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     // password policy
@@ -35,6 +39,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 
 // AddIdentity registers cookie handlers that hijack the default schemes.
 // Re-register JWT Bearer as the default after AddIdentity.
+// JWT is used because the frontend can send a bearer token with each protected API request.
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -76,6 +81,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 // Swagger services
+// Generates the interactive API documentation used during demos and testing.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -95,6 +101,7 @@ var app = builder.Build();
 // Swagger UI
 if (app.Environment.IsDevelopment())
 {
+    // Swagger UI is enabled in development so reviewers can inspect available endpoints quickly.
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -109,6 +116,7 @@ app.UseAuthorization();    // ← already assumed but not present
 app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
+    // Seeds default demo roles and users so authentication works after a fresh database setup.
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 

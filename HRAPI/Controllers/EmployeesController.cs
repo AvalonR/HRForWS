@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Exposes employee endpoints while EmployeeService owns employee business rules.
 public class EmployeesController : ApiControllerBase
 {
     private readonly IEmployeeService _employeeService;

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRAPI.Services;
 
+// Handles performance review validation for employee and reviewer relationships.
 public class PerformanceReviewService : IPerformanceReviewService
 {
     private readonly AppDbContext _context;

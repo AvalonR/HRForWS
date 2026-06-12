@@ -3,6 +3,7 @@ using HRAPI.Enums;
 
 namespace HRAPI.DTOs.PayrollRecords;
 
+// DTO used to create payroll records while validating employee and pay amounts.
 public class PayrollRecordCreateDto
 {
     [Range(1, int.MaxValue)]

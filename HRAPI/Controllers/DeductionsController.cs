@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HRAPI.Controllers;
 
 [Route("api/[controller]")]
+// Manages deductions that belong to payroll records.
 public class DeductionsController : ApiControllerBase
 {
     private readonly IDeductionService _deductionService;
