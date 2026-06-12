@@ -16,30 +16,73 @@ public class PerformanceReviewsController : ApiControllerBase
         _performanceReviewService = performanceReviewService;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "GetPerformanceReviews")]
     [Authorize(Roles = "Admin,HRManager,TeamLead")]
-    public async Task<ActionResult<IEnumerable<PerformanceReviewReadDto>>> GetPerformanceReviews()
+    public async Task<IActionResult> GetPerformanceReviews()
     {
-        return Ok(await _performanceReviewService.GetAllAsync());
+        var items = await _performanceReviewService.GetAllAsync();
+        var collectionLinks = Links(
+            ("self",   Url?.Link("GetPerformanceReviews", null), "GET"),
+            ("create", Url?.Action(nameof(CreatePerformanceReview)), "POST")
+        );
+        var result = new
+        {
+            items = items.Select(d => new
+            {
+                d.Id, d.EmployeeId, d.EmployeeName,
+                d.ReviewerId, d.ReviewerName,
+                d.ReviewDate, d.Rating,
+                d.Strengths, d.AreasForImprovement, d.Goals,
+                d.Status, d.NextReviewDate,
+                d.CreatedAt, d.UpdatedAt,
+                _links = Links(
+                    ("self",   Url?.Action(nameof(GetPerformanceReview), new { id = d.Id }), "GET"),
+                    ("update", Url?.Action(nameof(UpdatePerformanceReview), new { id = d.Id }), "PUT"),
+                    ("delete", Url?.Action(nameof(DeletePerformanceReview), new { id = d.Id }), "DELETE")
+                )
+            }),
+            _links = collectionLinks
+        };
+        return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetPerformanceReview")]
     [Authorize(Roles = "Admin,HRManager,TeamLead")]
-    public async Task<ActionResult<PerformanceReviewReadDto>> GetPerformanceReview(int id)
+    public async Task<IActionResult> GetPerformanceReview(int id)
     {
         var review = await _performanceReviewService.GetByIdAsync(id);
-        return review == null ? NotFound() : Ok(review);
+        if (review == null) return NotFound();
+        var result = new
+        {
+            data = review,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetPerformanceReview), new { id }), "GET"),
+                ("update", Url?.Action(nameof(UpdatePerformanceReview), new { id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeletePerformanceReview), new { id }), "DELETE")
+            )
+        };
+        return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,HRManager")]
-    public async Task<ActionResult<PerformanceReviewReadDto>> CreatePerformanceReview(PerformanceReviewCreateDto createDto)
+    public async Task<IActionResult> CreatePerformanceReview(PerformanceReviewCreateDto createDto)
     {
         var result = await _performanceReviewService.CreateAsync(createDto);
         if (!result.Succeeded)
             return BadRequest(result.ErrorMessage);
 
-        return CreatedAtAction(nameof(GetPerformanceReview), new { id = result.Data!.Id }, result.Data);
+        var data = result.Data!;
+        var resource = new
+        {
+            data,
+            _links = Links(
+                ("self",   Url?.Action(nameof(GetPerformanceReview), new { id = data.Id }), "GET"),
+                ("update", Url?.Action(nameof(UpdatePerformanceReview), new { id = data.Id }), "PUT"),
+                ("delete", Url?.Action(nameof(DeletePerformanceReview), new { id = data.Id }), "DELETE")
+            )
+        };
+        return CreatedAtAction(nameof(GetPerformanceReview), new { id = data.Id }, resource);
     }
 
     [HttpPut("{id:int}")]

@@ -21,7 +21,7 @@ public class EmployeesControllerTests
 
         var result = await controller.GetEmployees();
 
-        result.Result.Should().BeOfType<OkObjectResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class EmployeesControllerTests
 
         var result = await controller.GetEmployee(1);
 
-        result.Result.Should().BeOfType<OkObjectResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class EmployeesControllerTests
 
         var result = await controller.GetEmployee(999);
 
-        result.Result.Should().BeOfType<NotFoundResult>();
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class EmployeesControllerTests
 
         var result = await controller.GetEmployee(2);
 
-        result.Result.Should().BeOfType<ForbidResult>();
+        result.Should().BeOfType<ForbidResult>();
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class EmployeesControllerTests
 
         var result = await controller.CreateEmployee(dto);
 
-        result.Result.Should().BeOfType<CreatedAtActionResult>();
+        result.Should().BeOfType<CreatedAtActionResult>();
     }
 
     [Fact]

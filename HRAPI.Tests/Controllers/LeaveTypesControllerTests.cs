@@ -18,7 +18,7 @@ public class LeaveTypesControllerTests
 
         var result = await controller.GetLeaveTypes();
 
-        result.Result.Should().BeOfType<OkObjectResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class LeaveTypesControllerTests
 
         var result = await controller.GetLeaveType(1);
 
-        result.Result.Should().BeOfType<OkObjectResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class LeaveTypesControllerTests
 
         var result = await controller.GetLeaveType(999);
 
-        result.Result.Should().BeOfType<NotFoundResult>();
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class LeaveTypesControllerTests
 
         var result = await controller.CreateLeaveType(dto);
 
-        result.Result.Should().BeOfType<CreatedAtActionResult>();
+        result.Should().BeOfType<CreatedAtActionResult>();
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class LeaveTypesControllerTests
 
         var result = await controller.CreateLeaveType(dto);
 
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     [Fact]

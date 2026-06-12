@@ -18,7 +18,7 @@ public class DepartmentsControllerTests
 
         var result = await controller.GetDepartments();
 
-        result.Result.Should().BeOfType<OkObjectResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class DepartmentsControllerTests
 
         var result = await controller.GetDepartment(1);
 
-        result.Result.Should().BeOfType<OkObjectResult>();
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class DepartmentsControllerTests
 
         var result = await controller.GetDepartment(999);
 
-        result.Result.Should().BeOfType<NotFoundResult>();
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class DepartmentsControllerTests
 
         var result = await controller.CreateDepartment(dto);
 
-        result.Result.Should().BeOfType<CreatedAtActionResult>();
+        result.Should().BeOfType<CreatedAtActionResult>();
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class DepartmentsControllerTests
 
         var result = await controller.CreateDepartment(dto);
 
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     [Fact]
