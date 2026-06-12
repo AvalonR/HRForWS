@@ -11,70 +11,65 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import {
-  getDepartments,
-  deleteDepartment,
-} from "../../services/DepartmentService";
-import type { DepartmentReadDto } from "../../types/dto";
+  getSalaryHistories,
+  deleteSalaryHistory,
+} from "../../services/SalaryHistoryService";
+import type { SalaryHistoryReadDto } from "../../types/dto";
 import { useAuth } from "../../contexts/AuthContext";
 import { getErrorMessage } from "../../utils/errorUtils";
-import DepartmentFormDialog from "./DepartmentFormDialog";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import SalaryHistoryFormDialog from "./SalaryHistoryFormDialog";
+import DeleteConfirmDialog from "../departments/DeleteConfirmDialog";
 
-export default function DepartmentsList() {
+export default function SalaryHistoryList() {
   const { user } = useAuth();
-  const canCreate = user?.roles.some((r) => r === "Admin" || r === "HRManager");
-  const canEdit = canCreate;
+  const canManage = user?.roles.some((r) => r === "Admin" || r === "HRManager");
   const canDelete = user?.roles.includes("Admin");
-  const [departments, setDepartments] = useState<DepartmentReadDto[]>([]);
+  const [records, setRecords] = useState<SalaryHistoryReadDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [editingDept, setEditingDept] = useState<DepartmentReadDto | null>(
-    null,
-  );
-  const [deleteTarget, setDeleteTarget] = useState<DepartmentReadDto | null>(
-    null,
-  );
+  const [editingRecord, setEditingRecord] = useState<SalaryHistoryReadDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SalaryHistoryReadDto | null>(null);
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  const fetchDepartments = useCallback(async () => {
+  const fetchRecords = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getDepartments();
-      setDepartments(data);
+      const data = await getSalaryHistories();
+      setRecords(data);
     } catch {
-      setError("Failed to load departments.");
+      setError("Failed to load salary histories.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchDepartments();
-  }, [fetchDepartments]);
+    fetchRecords();
+  }, [fetchRecords]);
 
   const handleAdd = () => {
-    setEditingDept(null);
+    setEditingRecord(null);
     setFormOpen(true);
   };
 
-  const handleEdit = (dept: DepartmentReadDto) => {
-    setEditingDept(dept);
+  const handleEdit = (r: SalaryHistoryReadDto) => {
+    setEditingRecord(r);
     setFormOpen(true);
   };
 
   const handleFormSaved = () => {
     setFormOpen(false);
-    setEditingDept(null);
-    fetchDepartments();
+    setEditingRecord(null);
+    fetchRecords();
     setSnackbar({
-      message: editingDept
-        ? "Department updated successfully"
-        : "Department created successfully",
+      message: editingRecord
+        ? "Salary history updated successfully"
+        : "Salary history created successfully",
       severity: "success",
     });
   };
@@ -82,60 +77,28 @@ export default function DepartmentsList() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteDepartment(deleteTarget.id);
+      await deleteSalaryHistory(deleteTarget.id);
       setDeleteTarget(null);
-      fetchDepartments();
-      setSnackbar({
-        message: "Department deleted successfully",
-        severity: "success",
-      });
+      fetchRecords();
+      setSnackbar({ message: "Salary history deleted successfully", severity: "success" });
     } catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to delete department.");
+      const message = getErrorMessage(err, "Failed to delete salary history.");
       setSnackbar({ message, severity: "error" });
     }
   };
 
-  const columns: GridColDef<DepartmentReadDto>[] = [
-    { field: "code", headerName: "Code", width: 100 },
-    { field: "name", headerName: "Name", flex: 1, minWidth: 200 },
+  const columns: GridColDef<SalaryHistoryReadDto>[] = [
+    { field: "employeeName", headerName: "Employee", width: 160 },
     {
-      field: "description",
-      headerName: "Description",
-      flex: 1,
-      minWidth: 200,
+      field: "amount",
+      headerName: "Amount",
+      width: 130,
+      valueFormatter: (value?: number) =>
+        value != null ? `$${value.toLocaleString()}` : "-",
     },
-    {
-      field: "parentDepartmentId",
-      headerName: "Parent Department",
-      width: 180,
-      valueGetter: (_, row) => {
-        if (!row.parentDepartmentId) return null;
-        const parent = departments.find(
-          (d) => d.id === row.parentDepartmentId,
-        );
-        return parent?.name ?? null;
-      },
-    },
-    {
-      field: "isActive",
-      headerName: "Status",
-      width: 100,
-      renderCell: ({ row }) => (
-        <Box
-          sx={{
-            px: 1,
-            py: 0.25,
-            borderRadius: 1,
-            fontSize: 12,
-            fontWeight: 600,
-            bgcolor: row.isActive ? "#e8f5e9" : "#fce4ec",
-            color: row.isActive ? "#2e7d32" : "#c62828",
-          }}
-        >
-          {row.isActive ? "Active" : "Inactive"}
-        </Box>
-      ),
-    },
+    { field: "effectiveFrom", headerName: "Effective From", width: 130 },
+    { field: "effectiveTo", headerName: "Effective To", width: 130 },
+    { field: "changeReason", headerName: "Reason", flex: 1, minWidth: 200 },
     {
       field: "actions",
       headerName: "Actions",
@@ -143,7 +106,7 @@ export default function DepartmentsList() {
       sortable: false,
       renderCell: ({ row }) => (
         <Box>
-          {canEdit && (
+          {canManage && (
             <Tooltip title="Edit">
               <IconButton size="small" onClick={() => handleEdit(row)}>
                 <EditIcon fontSize="small" />
@@ -152,11 +115,7 @@ export default function DepartmentsList() {
           )}
           {canDelete && (
             <Tooltip title="Delete">
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => setDeleteTarget(row)}
-              >
+              <IconButton size="small" color="error" onClick={() => setDeleteTarget(row)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -170,7 +129,7 @@ export default function DepartmentsList() {
     return (
       <Box sx={{ p: 2 }}>
         <Typography color="error">{error}</Typography>
-        <Button onClick={fetchDepartments} sx={{ mt: 1 }}>
+        <Button onClick={fetchRecords} sx={{ mt: 1 }}>
           Retry
         </Button>
       </Box>
@@ -187,16 +146,16 @@ export default function DepartmentsList() {
           mb: 2,
         }}
       >
-        <Typography variant="h4">Departments</Typography>
-        {canCreate && (
+        <Typography variant="h4">Salary History</Typography>
+        {canManage && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            Add Department
+            Add Salary History
           </Button>
         )}
       </Box>
 
       <DataGrid
-        rows={departments}
+        rows={records}
         columns={columns}
         loading={loading}
         autoHeight
@@ -204,27 +163,23 @@ export default function DepartmentsList() {
         pageSizeOptions={[10, 25, 50]}
         initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
         getRowId={(row) => row.id}
-        localeText={{ noRowsLabel: "No departments found" }}
+        localeText={{ noRowsLabel: "No salary history found" }}
       />
 
       {formOpen && (
-        <DepartmentFormDialog
+        <SalaryHistoryFormDialog
           open={formOpen}
-          department={editingDept}
-          departments={departments}
+          record={editingRecord}
           onSaved={handleFormSaved}
-          onClose={() => {
-            setFormOpen(false);
-            setEditingDept(null);
-          }}
+          onClose={() => { setFormOpen(false); setEditingRecord(null); }}
         />
       )}
 
       {deleteTarget && (
         <DeleteConfirmDialog
           open={!!deleteTarget}
-          title="Delete Department"
-          message={`Are you sure you want to delete "${deleteTarget.name}"?`}
+          title="Delete Salary History"
+          message={`Are you sure you want to delete this salary history record?`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />

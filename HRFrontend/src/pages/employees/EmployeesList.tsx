@@ -11,70 +11,66 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import {
-  getDepartments,
-  deleteDepartment,
-} from "../../services/DepartmentService";
-import type { DepartmentReadDto } from "../../types/dto";
+  getEmployees,
+  deleteEmployee,
+} from "../../services/EmployeeService";
+import type { EmployeeReadDto } from "../../types/dto";
 import { useAuth } from "../../contexts/AuthContext";
 import { getErrorMessage } from "../../utils/errorUtils";
-import DepartmentFormDialog from "./DepartmentFormDialog";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import EmployeeFormDialog from "./EmployeeFormDialog";
+import DeleteConfirmDialog from "../departments/DeleteConfirmDialog";
 
-export default function DepartmentsList() {
+export default function EmployeesList() {
   const { user } = useAuth();
   const canCreate = user?.roles.some((r) => r === "Admin" || r === "HRManager");
   const canEdit = canCreate;
   const canDelete = user?.roles.includes("Admin");
-  const [departments, setDepartments] = useState<DepartmentReadDto[]>([]);
+  const [employees, setEmployees] = useState<EmployeeReadDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [editingDept, setEditingDept] = useState<DepartmentReadDto | null>(
-    null,
-  );
-  const [deleteTarget, setDeleteTarget] = useState<DepartmentReadDto | null>(
-    null,
-  );
+  const [editingEmp, setEditingEmp] = useState<EmployeeReadDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<EmployeeReadDto | null>(null);
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  const fetchDepartments = useCallback(async () => {
+  const fetchEmployees = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getDepartments();
-      setDepartments(data);
+      const data = await getEmployees();
+      setEmployees(data);
     } catch {
-      setError("Failed to load departments.");
+      setError("Failed to load employees.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchDepartments();
-  }, [fetchDepartments]);
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   const handleAdd = () => {
-    setEditingDept(null);
+    setEditingEmp(null);
     setFormOpen(true);
   };
 
-  const handleEdit = (dept: DepartmentReadDto) => {
-    setEditingDept(dept);
+  const handleEdit = (emp: EmployeeReadDto) => {
+    setEditingEmp(emp);
     setFormOpen(true);
   };
 
   const handleFormSaved = () => {
     setFormOpen(false);
-    setEditingDept(null);
-    fetchDepartments();
+    setEditingEmp(null);
+    fetchEmployees();
     setSnackbar({
-      message: editingDept
-        ? "Department updated successfully"
-        : "Department created successfully",
+      message: editingEmp
+        ? "Employee updated successfully"
+        : "Employee created successfully",
       severity: "success",
     });
   };
@@ -82,40 +78,27 @@ export default function DepartmentsList() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteDepartment(deleteTarget.id);
+      await deleteEmployee(deleteTarget.id);
       setDeleteTarget(null);
-      fetchDepartments();
+      fetchEmployees();
       setSnackbar({
-        message: "Department deleted successfully",
+        message: "Employee deleted successfully",
         severity: "success",
       });
     } catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to delete department.");
+      const message = getErrorMessage(err, "Failed to delete employee.");
       setSnackbar({ message, severity: "error" });
     }
   };
 
-  const columns: GridColDef<DepartmentReadDto>[] = [
-    { field: "code", headerName: "Code", width: 100 },
-    { field: "name", headerName: "Name", flex: 1, minWidth: 200 },
-    {
-      field: "description",
-      headerName: "Description",
-      flex: 1,
-      minWidth: 200,
-    },
-    {
-      field: "parentDepartmentId",
-      headerName: "Parent Department",
-      width: 180,
-      valueGetter: (_, row) => {
-        if (!row.parentDepartmentId) return null;
-        const parent = departments.find(
-          (d) => d.id === row.parentDepartmentId,
-        );
-        return parent?.name ?? null;
-      },
-    },
+  const columns: GridColDef<EmployeeReadDto>[] = [
+    { field: "employeeNumber", headerName: "Emp #", width: 100 },
+    { field: "fullName", headerName: "Name", flex: 1, minWidth: 180 },
+    { field: "email", headerName: "Email", flex: 1, minWidth: 200 },
+    { field: "departmentName", headerName: "Department", width: 160 },
+    { field: "positionTitle", headerName: "Position", width: 160 },
+    { field: "phone", headerName: "Phone", width: 130 },
+    { field: "hireDate", headerName: "Hire Date", width: 110 },
     {
       field: "isActive",
       headerName: "Status",
@@ -170,7 +153,7 @@ export default function DepartmentsList() {
     return (
       <Box sx={{ p: 2 }}>
         <Typography color="error">{error}</Typography>
-        <Button onClick={fetchDepartments} sx={{ mt: 1 }}>
+        <Button onClick={fetchEmployees} sx={{ mt: 1 }}>
           Retry
         </Button>
       </Box>
@@ -187,16 +170,16 @@ export default function DepartmentsList() {
           mb: 2,
         }}
       >
-        <Typography variant="h4">Departments</Typography>
+        <Typography variant="h4">Employees</Typography>
         {canCreate && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            Add Department
+            Add Employee
           </Button>
         )}
       </Box>
 
       <DataGrid
-        rows={departments}
+        rows={employees}
         columns={columns}
         loading={loading}
         autoHeight
@@ -204,18 +187,17 @@ export default function DepartmentsList() {
         pageSizeOptions={[10, 25, 50]}
         initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
         getRowId={(row) => row.id}
-        localeText={{ noRowsLabel: "No departments found" }}
+        localeText={{ noRowsLabel: "No employees found" }}
       />
 
       {formOpen && (
-        <DepartmentFormDialog
+        <EmployeeFormDialog
           open={formOpen}
-          department={editingDept}
-          departments={departments}
+          employee={editingEmp}
           onSaved={handleFormSaved}
           onClose={() => {
             setFormOpen(false);
-            setEditingDept(null);
+            setEditingEmp(null);
           }}
         />
       )}
@@ -223,8 +205,8 @@ export default function DepartmentsList() {
       {deleteTarget && (
         <DeleteConfirmDialog
           open={!!deleteTarget}
-          title="Delete Department"
-          message={`Are you sure you want to delete "${deleteTarget.name}"?`}
+          title="Delete Employee"
+          message={`Are you sure you want to delete "${deleteTarget.fullName}"?`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />

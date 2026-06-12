@@ -11,70 +11,86 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import {
-  getDepartments,
-  deleteDepartment,
-} from "../../services/DepartmentService";
-import type { DepartmentReadDto } from "../../types/dto";
+  getAttendances,
+  deleteAttendance,
+} from "../../services/AttendanceService";
+import type { AttendanceReadDto } from "../../types/dto";
 import { useAuth } from "../../contexts/AuthContext";
 import { getErrorMessage } from "../../utils/errorUtils";
-import DepartmentFormDialog from "./DepartmentFormDialog";
-import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import AttendanceFormDialog from "./AttendanceFormDialog";
+import DeleteConfirmDialog from "../departments/DeleteConfirmDialog";
 
-export default function DepartmentsList() {
+const ATTENDANCE_LABELS = ["Present", "Absent", "Late", "HalfDay", "Remote", "OnLeave"];
+
+function statusColor(status: number) {
+  switch (ATTENDANCE_LABELS[status]) {
+    case "Present":
+      return { bg: "#e8f5e9", color: "#2e7d32" };
+    case "Absent":
+      return { bg: "#fce4ec", color: "#c62828" };
+    case "Late":
+      return { bg: "#fff3e0", color: "#e65100" };
+    case "HalfDay":
+      return { bg: "#fff8e1", color: "#f57f17" };
+    case "Remote":
+      return { bg: "#e3f2fd", color: "#1565c0" };
+    case "OnLeave":
+      return { bg: "#f3e5f5", color: "#7b1fa2" };
+    default:
+      return { bg: "#f5f5f5", color: "#616161" };
+  }
+}
+
+export default function AttendanceList() {
   const { user } = useAuth();
-  const canCreate = user?.roles.some((r) => r === "Admin" || r === "HRManager");
-  const canEdit = canCreate;
+  const canManage = user?.roles.some((r) => r === "Admin" || r === "HRManager");
   const canDelete = user?.roles.includes("Admin");
-  const [departments, setDepartments] = useState<DepartmentReadDto[]>([]);
+  const [attendance, setAttendance] = useState<AttendanceReadDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [editingDept, setEditingDept] = useState<DepartmentReadDto | null>(
-    null,
-  );
-  const [deleteTarget, setDeleteTarget] = useState<DepartmentReadDto | null>(
-    null,
-  );
+  const [editingRecord, setEditingRecord] = useState<AttendanceReadDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AttendanceReadDto | null>(null);
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  const fetchDepartments = useCallback(async () => {
+  const fetchAttendance = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getDepartments();
-      setDepartments(data);
+      const data = await getAttendances();
+      setAttendance(data);
     } catch {
-      setError("Failed to load departments.");
+      setError("Failed to load attendance records.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchDepartments();
-  }, [fetchDepartments]);
+    fetchAttendance();
+  }, [fetchAttendance]);
 
   const handleAdd = () => {
-    setEditingDept(null);
+    setEditingRecord(null);
     setFormOpen(true);
   };
 
-  const handleEdit = (dept: DepartmentReadDto) => {
-    setEditingDept(dept);
+  const handleEdit = (r: AttendanceReadDto) => {
+    setEditingRecord(r);
     setFormOpen(true);
   };
 
   const handleFormSaved = () => {
     setFormOpen(false);
-    setEditingDept(null);
-    fetchDepartments();
+    setEditingRecord(null);
+    fetchAttendance();
     setSnackbar({
-      message: editingDept
-        ? "Department updated successfully"
-        : "Department created successfully",
+      message: editingRecord
+        ? "Attendance updated successfully"
+        : "Attendance created successfully",
       severity: "success",
     });
   };
@@ -82,44 +98,25 @@ export default function DepartmentsList() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteDepartment(deleteTarget.id);
+      await deleteAttendance(deleteTarget.id);
       setDeleteTarget(null);
-      fetchDepartments();
-      setSnackbar({
-        message: "Department deleted successfully",
-        severity: "success",
-      });
+      fetchAttendance();
+      setSnackbar({ message: "Attendance deleted successfully", severity: "success" });
     } catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to delete department.");
+      const message = getErrorMessage(err, "Failed to delete attendance.");
       setSnackbar({ message, severity: "error" });
     }
   };
 
-  const columns: GridColDef<DepartmentReadDto>[] = [
-    { field: "code", headerName: "Code", width: 100 },
-    { field: "name", headerName: "Name", flex: 1, minWidth: 200 },
+  const columns: GridColDef<AttendanceReadDto>[] = [
+    { field: "employeeName", headerName: "Employee", width: 160 },
+    { field: "date", headerName: "Date", width: 110 },
+    { field: "checkIn", headerName: "Check In", width: 100 },
+    { field: "checkOut", headerName: "Check Out", width: 100 },
     {
-      field: "description",
-      headerName: "Description",
-      flex: 1,
-      minWidth: 200,
-    },
-    {
-      field: "parentDepartmentId",
-      headerName: "Parent Department",
-      width: 180,
-      valueGetter: (_, row) => {
-        if (!row.parentDepartmentId) return null;
-        const parent = departments.find(
-          (d) => d.id === row.parentDepartmentId,
-        );
-        return parent?.name ?? null;
-      },
-    },
-    {
-      field: "isActive",
+      field: "status",
       headerName: "Status",
-      width: 100,
+      width: 110,
       renderCell: ({ row }) => (
         <Box
           sx={{
@@ -128,14 +125,14 @@ export default function DepartmentsList() {
             borderRadius: 1,
             fontSize: 12,
             fontWeight: 600,
-            bgcolor: row.isActive ? "#e8f5e9" : "#fce4ec",
-            color: row.isActive ? "#2e7d32" : "#c62828",
+            ...statusColor(row.status),
           }}
         >
-          {row.isActive ? "Active" : "Inactive"}
+          {ATTENDANCE_LABELS[row.status] ?? row.status}
         </Box>
       ),
     },
+    { field: "notes", headerName: "Notes", flex: 1, minWidth: 150 },
     {
       field: "actions",
       headerName: "Actions",
@@ -143,7 +140,7 @@ export default function DepartmentsList() {
       sortable: false,
       renderCell: ({ row }) => (
         <Box>
-          {canEdit && (
+          {canManage && (
             <Tooltip title="Edit">
               <IconButton size="small" onClick={() => handleEdit(row)}>
                 <EditIcon fontSize="small" />
@@ -152,11 +149,7 @@ export default function DepartmentsList() {
           )}
           {canDelete && (
             <Tooltip title="Delete">
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => setDeleteTarget(row)}
-              >
+              <IconButton size="small" color="error" onClick={() => setDeleteTarget(row)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -170,7 +163,7 @@ export default function DepartmentsList() {
     return (
       <Box sx={{ p: 2 }}>
         <Typography color="error">{error}</Typography>
-        <Button onClick={fetchDepartments} sx={{ mt: 1 }}>
+        <Button onClick={fetchAttendance} sx={{ mt: 1 }}>
           Retry
         </Button>
       </Box>
@@ -187,16 +180,16 @@ export default function DepartmentsList() {
           mb: 2,
         }}
       >
-        <Typography variant="h4">Departments</Typography>
-        {canCreate && (
+        <Typography variant="h4">Attendance</Typography>
+        {canManage && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            Add Department
+            Add Attendance
           </Button>
         )}
       </Box>
 
       <DataGrid
-        rows={departments}
+        rows={attendance}
         columns={columns}
         loading={loading}
         autoHeight
@@ -204,27 +197,23 @@ export default function DepartmentsList() {
         pageSizeOptions={[10, 25, 50]}
         initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
         getRowId={(row) => row.id}
-        localeText={{ noRowsLabel: "No departments found" }}
+        localeText={{ noRowsLabel: "No attendance records found" }}
       />
 
       {formOpen && (
-        <DepartmentFormDialog
+        <AttendanceFormDialog
           open={formOpen}
-          department={editingDept}
-          departments={departments}
+          attendance={editingRecord}
           onSaved={handleFormSaved}
-          onClose={() => {
-            setFormOpen(false);
-            setEditingDept(null);
-          }}
+          onClose={() => { setFormOpen(false); setEditingRecord(null); }}
         />
       )}
 
       {deleteTarget && (
         <DeleteConfirmDialog
           open={!!deleteTarget}
-          title="Delete Department"
-          message={`Are you sure you want to delete "${deleteTarget.name}"?`}
+          title="Delete Attendance Record"
+          message={`Are you sure you want to delete attendance for "${deleteTarget.employeeName}" on ${deleteTarget.date}?`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />

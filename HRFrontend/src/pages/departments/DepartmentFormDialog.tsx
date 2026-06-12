@@ -17,6 +17,7 @@ import type {
   DepartmentCreateDto,
   DepartmentUpdateDto,
 } from "../../types/dto";
+import { getErrorMessage } from "../../utils/errorUtils";
 
 interface Props {
   open: boolean;
@@ -52,6 +53,7 @@ export default function DepartmentFormDialog({
   }, [open, department]);
 
   const handleSave = async () => {
+    if (saving) return;
     if (!name.trim() || !code.trim()) return;
 
     setSaving(true);
@@ -81,9 +83,7 @@ export default function DepartmentFormDialog({
       }
       onSaved();
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: string } })?.response?.data ||
-        "An error occurred.";
+      const message = getErrorMessage(err, "An error occurred.");
       setError(message);
     } finally {
       setSaving(false);
